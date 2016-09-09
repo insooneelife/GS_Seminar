@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="_1">
+      <UniqueIdentifier>{18060621-eb74-4e8d-b71e-b254f2c82d55}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="_1\Story.cpp">
+      <Filter>_1</Filter>
+    </ClCompile>
+    <ClCompile Include="_1\main.cpp">
+      <Filter>_1</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="_1\UDP.h">
+      <Filter>_1</Filter>
+    </ClInclude>
+    <ClInclude Include="_1\TCP.h">
+      <Filter>_1</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

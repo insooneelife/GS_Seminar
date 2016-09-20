@@ -1,24 +1,54 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="_1">
-      <UniqueIdentifier>{18060621-eb74-4e8d-b71e-b254f2c82d55}</UniqueIdentifier>
+    <Filter Include="seminar1">
+      <UniqueIdentifier>{c288fadb-3f98-4970-aeb4-76871bde6845}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="seminar2">
+      <UniqueIdentifier>{fbaf670d-f3a3-47d7-81d7-5688d7ec785a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="_1\Story.cpp">
-      <Filter>_1</Filter>
+    <ClCompile Include="seminar1\main.cpp">
+      <Filter>seminar1</Filter>
     </ClCompile>
-    <ClCompile Include="_1\main.cpp">
-      <Filter>_1</Filter>
+    <ClCompile Include="seminar1\Story.cpp">
+      <Filter>seminar1</Filter>
+    </ClCompile>
+    <ClCompile Include="seminar2\SocketAddress.cpp">
+      <Filter>seminar2</Filter>
+    </ClCompile>
+    <ClCompile Include="seminar2\SocketUtil.cpp">
+      <Filter>seminar2</Filter>
+    </ClCompile>
+    <ClCompile Include="seminar2\TCPSocket.cpp">
+      <Filter>seminar2</Filter>
+    </ClCompile>
+    <ClCompile Include="seminar2\UDPSocket.cpp">
+      <Filter>seminar2</Filter>
+    </ClCompile>
+    <ClCompile Include="seminar2\main.cpp">
+      <Filter>seminar2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="_1\UDP.h">
-      <Filter>_1</Filter>
+    <ClInclude Include="seminar1\TCP.h">
+      <Filter>seminar1</Filter>
     </ClInclude>
-    <ClInclude Include="_1\TCP.h">
-      <Filter>_1</Filter>
+    <ClInclude Include="seminar1\UDP.h">
+      <Filter>seminar1</Filter>
+    </ClInclude>
+    <ClInclude Include="seminar2\SocketAddress.h">
+      <Filter>seminar2</Filter>
+    </ClInclude>
+    <ClInclude Include="seminar2\SocketUtil.h">
+      <Filter>seminar2</Filter>
+    </ClInclude>
+    <ClInclude Include="seminar2\TCPSocket.h">
+      <Filter>seminar2</Filter>
+    </ClInclude>
+    <ClInclude Include="seminar2\UDPSocket.h">
+      <Filter>seminar2</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

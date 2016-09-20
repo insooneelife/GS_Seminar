@@ -9,9 +9,9 @@ const int BufferSize = 256;
 const int Port = 9999;
 const std::string IP = "127.0.0.1";
 
-namespace
+namespace _ex1
 {
-	void initWindowSocket()
+	void initWindowSocket() 
 	{
 		WSADATA wsa;
 		if (WSAStartup(MAKEWORD(2, 2), &wsa) != NO_ERROR)

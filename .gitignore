@@ -1,6 +1,12 @@
 Debug/
 GS_Seminar/Debug/
+<<<<<<< HEAD
 /.vs
 *.db
 *.opendb
 *.suo
+=======
+*.db
+*.suo
+*.opendb
+>>>>>>> Fix

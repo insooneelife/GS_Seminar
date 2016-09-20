@@ -1,5 +1,6 @@
 Debug/
 GS_Seminar/Debug/
+.vs/
 *.db
 *.opendb
 *.suo

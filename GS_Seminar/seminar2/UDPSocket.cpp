@@ -4,11 +4,11 @@
 
 int UDPSocket::Bind( const SocketAddress& inBindAddress )
 {
-	int error = bind( mSocket, &inBindAddress.mSockAddr, inBindAddress.getSize() );
+	int error = bind( mSocket, &inBindAddress._sockaddr, inBindAddress.getSize() );
 	if( error != 0 )
 	{
-		SocketUtil::ReportError( "UDPSocket::Bind" );
-		return SocketUtil::GetLastError();
+		SocketUtil::reportError( "UDPSocket::Bind" );
+		return SocketUtil::getLastError();
 	}
 	
 	return NO_ERROR;
@@ -19,12 +19,12 @@ int UDPSocket::SendTo( const void* inToSend, int inLength, const SocketAddress& 
 	int byteSentCount = sendto( mSocket,
 							   static_cast< const char* >( inToSend ),
 							   inLength,
-							   0, &inToAddress.mSockAddr, inToAddress.getSize() );
+							   0, &inToAddress._sockaddr, inToAddress.getSize() );
 	if( byteSentCount <= 0 )
 	{
 		//we'll return error as negative number to indicate less than requested amount of bytes sent...
-		SocketUtil::ReportError( "UDPSocket::SendTo" );
-		return -SocketUtil::GetLastError();
+		SocketUtil::reportError( "UDPSocket::SendTo" );
+		return -SocketUtil::getLastError();
 	}
 	else
 	{
@@ -39,14 +39,14 @@ int UDPSocket::ReceiveFrom( void* inToReceive, int inMaxLength, SocketAddress& o
 	int readByteCount = recvfrom( mSocket,
 								 static_cast< char* >( inToReceive ),
 								 inMaxLength,
-								 0, &outFromAddress.mSockAddr, &fromLength );
+								 0, &outFromAddress._sockaddr, &fromLength );
 	if( readByteCount >= 0 )
 	{
 		return readByteCount;
 	}
 	else
 	{
-		int error = SocketUtil::GetLastError();
+		int error = SocketUtil::getLastError();
 		
 		if( error == WSAEWOULDBLOCK )
 		{
@@ -61,7 +61,7 @@ int UDPSocket::ReceiveFrom( void* inToReceive, int inMaxLength, SocketAddress& o
 		}
 		else
 		{
-			SocketUtil::ReportError( "UDPSocket::ReceiveFrom" );
+			SocketUtil::reportError( "UDPSocket::ReceiveFrom" );
 			return -error;
 		}
 	}
@@ -90,8 +90,8 @@ int UDPSocket::SetNonBlockingMode( bool inShouldBeNonBlocking )
 	
 	if( result == SOCKET_ERROR )
 	{
-		SocketUtil::ReportError( "UDPSocket::SetNonBlockingMode" );
-		return SocketUtil::GetLastError();
+		SocketUtil::reportError( "UDPSocket::SetNonBlockingMode" );
+		return SocketUtil::getLastError();
 	}
 	else
 	{

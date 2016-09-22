@@ -4,29 +4,23 @@
 #include <Windows.h>
 #include <memory>
 #include "SocketAddress.h"
+#include "SocketUtil.h"
 
 class UDPSocket
 {
 public:
-
+	// UDP socketÀÇ »ý¼º
+	static UDPSocket* create(SocketUtil::AddressFamily family);
 	~UDPSocket();
 
-	int Bind( const SocketAddress& inToAddress );
-	int SendTo( const void* inToSend, int inLength, const SocketAddress& inToAddress );
-	int ReceiveFrom( void* inToReceive, int inMaxLength, SocketAddress& outFromAddress );
-
-	/*
-	int SendTo( const MemoryOutputStream& inMOS, const SocketAddress& inToAddress );
-	int ReceiveFrom( MemoryInputStream& inMIS, SocketAddress& outFromAddress );
-	*/
-
-	int SetNonBlockingMode( bool inShouldBeNonBlocking );
+	int bind(const SocketAddress& to_addr);
+	int sendTo(const void* data, int length, const SocketAddress& to_addr);
+	int receiveFrom(void* data, int max_length, SocketAddress& from_addr);
+	int setNoneBlockingMode(bool flag);
 
 private:
-	friend class SocketUtil;
-	UDPSocket( SOCKET inSocket ) : mSocket( inSocket ) {}
-	SOCKET mSocket;
+	UDPSocket(SOCKET socket) : _socket(socket) {}
+	SOCKET _socket;
 
 };
 
-typedef std::shared_ptr< UDPSocket >	UDPSocketPtr;

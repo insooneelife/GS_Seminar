@@ -1,72 +1,86 @@
 #include "TCPSocket.h"
-#include "SocketUtil.h"
 
-int TCPSocket::Connect( const SocketAddress& inAddress )
+TCPSocket* TCPSocket::create(SocketUtil::AddressFamily family)
 {
-	int err = connect( mSocket, &inAddress._sockaddr, inAddress.getSize() );
-	if( err < 0 )
-	{
-		SocketUtil::reportError( "TCPSocket::Connect" );
-		return -SocketUtil::getLastError();
-	}
-	return NO_ERROR;
-}
+	SOCKET s = socket(family, SOCK_STREAM, IPPROTO_TCP);
 
-int TCPSocket::Listen( int inBackLog )
-{
-	int err = listen( mSocket, inBackLog );
-	if( err < 0 )
+	if (s != INVALID_SOCKET)
 	{
-		SocketUtil::reportError( "TCPSocket::Listen" );
-		return -SocketUtil::getLastError();
-	}
-	return NO_ERROR;
-}
-
-TCPSocketPtr TCPSocket::Accept( SocketAddress& inFromAddress )
-{
-	socklen_t length = inFromAddress.getSize();
-	SOCKET newSocket = accept( mSocket, &inFromAddress._sockaddr, &length );
-
-	if( newSocket != INVALID_SOCKET )
-	{
-		return TCPSocketPtr( new TCPSocket( newSocket ) );
+		return new TCPSocket(s);
 	}
 	else
 	{
-		SocketUtil::reportError( "TCPSocket::Accept" );
+		SocketUtil::reportError("TCPSocket::create");
 		return nullptr;
 	}
 }
 
-int32_t	TCPSocket::Send( const void* inData, size_t inLen )
+int TCPSocket::connect(const SocketAddress& address)
 {
-	int bytesSentCount = send( mSocket, static_cast< const char* >( inData ), inLen, 0 );
-	if( bytesSentCount < 0 )
+	int err = ::connect(_socket, &address._sockaddr, address.getSize());
+	if(err < 0)
 	{
-		SocketUtil::reportError( "TCPSocket::Send" );
+		SocketUtil::reportError("TCPSocket::connect");
 		return -SocketUtil::getLastError();
 	}
-	return bytesSentCount;
+	return NO_ERROR;
 }
 
-int32_t	TCPSocket::Receive( void* inData, size_t inLen )
+int TCPSocket::listen(int back_num)
 {
-	int bytesReceivedCount = recv( mSocket, static_cast< char* >( inData ), inLen, 0 );
-	if( bytesReceivedCount < 0 )
+	int err = ::listen(_socket, back_num);
+	if(err < 0)
 	{
-		SocketUtil::reportError( "TCPSocket::Receive" );
+		SocketUtil::reportError("TCPSocket::listen");
 		return -SocketUtil::getLastError();
 	}
-	return bytesReceivedCount;
+	return NO_ERROR;
 }
 
-int TCPSocket::Bind( const SocketAddress& inBindAddress )
+TCPSocket* TCPSocket::accept(SocketAddress& from_addr)
 {
-	int error = bind( mSocket, &inBindAddress._sockaddr, inBindAddress.getSize() );
-	if( error != 0 )
+	socklen_t length = from_addr.getSize();
+	SOCKET new_socket = ::accept(_socket, &from_addr._sockaddr, &length);
+
+	if(new_socket != INVALID_SOCKET)
 	{
-		SocketUtil::reportError( "TCPSocket::Bind" );
+		return new TCPSocket(new_socket);
+	}
+	else
+	{
+		SocketUtil::reportError("TCPSocket::accept");
+		return nullptr;
+	}
+}
+
+int32_t	TCPSocket::send(const void* data, size_t length)
+{
+	int bytes_sent = ::send(_socket, static_cast<const char*>(data), length, 0);
+	if (bytes_sent < 0)
+	{
+		SocketUtil::reportError("TCPSocket::send");
+		return -SocketUtil::getLastError();
+	}
+	return bytes_sent;
+}
+
+int32_t	TCPSocket::receive(void* data, size_t length)
+{
+	int bytes_received = ::recv(_socket, static_cast<char*>(data), length, 0);
+	if (bytes_received < 0)
+	{
+		SocketUtil::reportError("TCPSocket::receive");
+		return -SocketUtil::getLastError();
+	}
+	return bytes_received;
+}
+
+int TCPSocket::bind(const SocketAddress& address)
+{
+	int error = ::bind(_socket, &address._sockaddr, address.getSize());
+	if (error != 0)
+	{
+		SocketUtil::reportError("TCPSocket::bind");
 		return SocketUtil::getLastError();
 	}
 
@@ -76,7 +90,7 @@ int TCPSocket::Bind( const SocketAddress& inBindAddress )
 TCPSocket::~TCPSocket()
 {
 #if _WIN32
-	closesocket( mSocket );
+	closesocket(_socket);
 #else
 	close( mSocket );
 #endif

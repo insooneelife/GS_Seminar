@@ -1,6 +1,4 @@
 #include "SocketUtil.h"
-#include "TCPSocket.h"
-#include "UDPSocket.h"
 
 bool SocketUtil::staticInit()
 {
@@ -54,34 +52,4 @@ int SocketUtil::getLastError()
 #else
 	return errno;
 #endif
-}
-
-UDPSocketPtr SocketUtil::CreateUDPSocket( SocketAddressFamily inFamily )
-{
-	SOCKET s = socket( inFamily, SOCK_DGRAM, IPPROTO_UDP );
-	
-	if( s != INVALID_SOCKET )
-	{
-		return UDPSocketPtr( new UDPSocket( s ) );
-	}
-	else
-	{
-		reportError( "SocketUtil::CreateUDPSocket" );
-		return nullptr;
-	}
-}
-
-TCPSocketPtr SocketUtil::CreateTCPSocket( SocketAddressFamily inFamily )
-{
-	SOCKET s = socket( inFamily, SOCK_STREAM, IPPROTO_TCP );
-	
-	if( s != INVALID_SOCKET )
-	{
-		return TCPSocketPtr( new TCPSocket( s ) );
-	}
-	else
-	{
-		reportError( "SocketUtil::CreateTCPSocket" );
-		return nullptr;
-	}
 }

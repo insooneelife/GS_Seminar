@@ -2,7 +2,7 @@
 // UDP 통신은 편지와 굉장히 흡사한 과정으로 이루어진다.
 // 그러므로 편지를 통해 UDP의 동작원리를 설명하고자 한다.
 
-// 편지 = data
+// 편지 = packet
 // 주소 = socket address
 // 우체통 = socket
 
@@ -35,72 +35,69 @@
 
 // 즉 서버와 클라이언트 간의 역할 차이가 별로 없다.
 // 유일한 차이는 bind인데 여기서 궁금증이 생길 수 있는 부분은,
-// 왜 서버에만 bind를 해 주어야 하느냐이다.
+// 왜 클라이언트의 경우에는 bind를 통해 주소할당을 따로 해주지 않느냐이다.
 
-// 이것도 마찬가지로 
+// 클라이언트의 경우, 서버에 전송할 때
+// sendto 함수호출 시점까지 주소정보가 할당되지 않았다면,
+// 첫 sendto를 하는 시점에 호스트의 ip번호와 사용하지 않는 port번호가 할당된다.
+
+// 그리고 recvfrom 함수를 통해 주소 정보와 함께 packet을 받았기 때문에,
+// 이후에 서버 측에서 다시 응답을 보낼 때는, 해당 주소로 다시 보내주면 된다.
 
 #include <string>
 #include <iostream>
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <Ws2tcpip.h>
+#include <WinSock2.h>
 #include <stdio.h>
-
 using namespace std;
-
-const int BufferSize = 256;
-const int Port = 9999;
-const std::string IP = "127.0.0.1";
 
 namespace _ex1
 {
+	const int BufferSize = 256;
+	const int Port = 9999;
+	const std::string IP = "127.0.0.1";
+
 	// window에서 socket을 사용하기 위한 초기작업
 	void initWindowSocket() 
 	{
 		WSADATA wsa;
 		if (WSAStartup(MAKEWORD(2, 2), &wsa) != NO_ERROR)
-		{
 			cout << "실패. error code : " << WSAGetLastError() << endl;
-			WSACleanup();
-			exit(EXIT_FAILURE);
-		}
 	}
 
-	// socket 생성 과정
+	// UDP socket 생성 과정
 	SOCKET createSocket()
 	{
 		SOCKET sock;
-		if ((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
-		{
+		// UDP socket 생성
+		if ((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
 			cout << "socket() 생성 실패. error code : " << WSAGetLastError() << endl;
-			WSACleanup();
-			exit(EXIT_FAILURE);
-		}
 		return sock;
 	}
 
 	// UDP 통신은 목적지에 대한 정보까지 포함해서 함수(sendto)를 호출한다.
 	// UDP의 경우 연결을 유지하고 있을 필요가 없기 때문에, 이러한 방법을 사용한다.
-	void sendProcess(struct sockaddr_in* otherAddress, SOCKET socket, string message)
+	void sendProcess(struct sockaddr_in* address, SOCKET socket, string message)
 	{
 		// Message 전송
 		int ret =
 			sendto(
-				socket,
-				message.c_str(),
+				socket,								// 우체통에
+				message.c_str(),					// 편지를
 				message.size(),
 				0,
-				(struct sockaddr *) otherAddress,
-				sizeof(struct sockaddr_in));
+				(struct sockaddr *) address,		// <- 주소로
+				sizeof(struct sockaddr_in));		// 보낸다.
 
 		// 오류 시 작업
 		if (ret == SOCKET_ERROR)
-		{
 			cout << "sendto() 전속 실패  error code : " << WSAGetLastError() << endl;
-			exit(EXIT_FAILURE);
-		}
 	}
 
 	// UDP 통신은 recvfrom 함수를 통해 data와 data가 온 주소에 대한 정보까지 얻어온다.
-	void recvProcess(struct sockaddr_in* otherAddress, SOCKET socket)
+	void recvProcess(struct sockaddr_in* address, SOCKET socket)
 	{
 		// Message 수신
 		char recvMessage[BufferSize] = { 0 };
@@ -108,19 +105,16 @@ namespace _ex1
 
 		int ret =
 			recvfrom(
-				socket,
-				recvMessage,
+				socket,								// 우체통에서
+				recvMessage,						// 편지를
 				BufferSize,
 				0,
-				(struct sockaddr *) otherAddress,
-				&len);
+				(struct sockaddr *) address,		// <- 주소로 된
+				&len);								// 꺼낸다.
 
 		// 오류 시 작업
 		if (ret == SOCKET_ERROR)
-		{
 			cout << "recvfrom() 실패  error code : " << WSAGetLastError() << endl;
-			exit(EXIT_FAILURE);
-		}
 
 		// 응답 출력
 		cout << "size : " << ret << "  data : " << recvMessage << endl;
@@ -135,7 +129,7 @@ namespace _ex1
 
 		// Socket 생성
 		SOCKET mySocket = createSocket();
-
+		
 		// Address 구조체 초기화
 		struct sockaddr_in otherAddress;
 		memset((char *)&otherAddress, 0, sizeof(otherAddress));
@@ -179,11 +173,7 @@ namespace _ex1
 
 		// Socket에 주소 할당
 		if (bind(mySocket, (struct sockaddr*)&myAddress, sizeof(myAddress)) == SOCKET_ERROR)
-		{
 			std::cout << "주소 할당 실패" << endl;
-			WSACleanup();
-			exit(EXIT_FAILURE);
-		}
 
 		while (1)
 		{

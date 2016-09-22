@@ -11,7 +11,8 @@
 class SocketAddress
 {
 public:
-	// Static factory 함수
+	// Static factory 함수 
+	// 사용 -> createFromString("127.0.0.1:8000");
 	static SocketAddress* createFromString(const std::string& addr);
 
 	// IP(unsigned int 형태), port를 이용한 생성자
@@ -46,6 +47,7 @@ public:
 	}
 
 	// Hash code
+	// SocketAddress 내부 데이터를 이용하여 유일한 값을 만든다.
 	size_t getHash() const
 	{
 		return 
@@ -63,6 +65,7 @@ private:
 	friend class TCPSocket;
 
 	sockaddr _sockaddr;
+
 #if _WIN32
 	// IPv4로 반환 (참조를 리턴하기 때문에 실제 객체의 데이터를 변경할 수 있다.)
 	uint32_t&			asIPv4()				{ return *reinterpret_cast< uint32_t* >( &asSockAddrIn()->sin_addr.S_un.S_addr ); }

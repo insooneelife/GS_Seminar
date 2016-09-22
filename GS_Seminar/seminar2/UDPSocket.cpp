@@ -1,11 +1,14 @@
 #include "UDPSocket.h"
 
+// UDPSocket class를 생성하기 위한 유일한 함수
 UDPSocket* UDPSocket::create(SocketUtil::AddressFamily family)
 {
+	// 실제 UDP socket 생성
 	SOCKET s = ::socket(family, SOCK_DGRAM, IPPROTO_UDP);
 
 	if (s != INVALID_SOCKET)
 	{
+		// 열린 SOCKET 변수를 이용하여 사용하기 편리한 UDPSocket 객체를 생성하여 반환
 		return new UDPSocket(s);
 	}
 	else
@@ -16,8 +19,11 @@ UDPSocket* UDPSocket::create(SocketUtil::AddressFamily family)
 }
 
 
+// UDP 통신의 bind 함수 interfacing
+// SocketAddress를 사용한다.
 int UDPSocket::bind(const SocketAddress& to_addr)
 {
+	// 실제 bind 함수를 통해 socket에 주소를 할당한다.
 	int error = ::bind(_socket, &to_addr._sockaddr, to_addr.getSize());
 	if (error != 0)
 	{
@@ -28,31 +34,43 @@ int UDPSocket::bind(const SocketAddress& to_addr)
 	return NO_ERROR;
 }
 
+// UDP 통신의 sendto 함수 interfacing
+// SocketAddress를 사용한다.
+// data에는 보낼 데이터를 담아서 인자로 넣어준다.
+// length에는 data의 길이를 넣어준다.
 
 int UDPSocket::sendTo(const void* data, int length, const SocketAddress& to_addr)
 {
-	int byteSentCount = ::sendto(_socket, static_cast<const char*>(data), length, 0, &to_addr._sockaddr, to_addr.getSize());
-	if(byteSentCount <= 0)
+	int sent_length = ::sendto(_socket, static_cast<const char*>(data), length, 0, &to_addr._sockaddr, to_addr.getSize());
+	if(sent_length <= 0)
 	{
-		//we'll return error as negative number to indicate less than requested amount of bytes sent...
+		// we'll return error as negative number to indicate less than requested amount of bytes sent...
 		SocketUtil::reportError("UDPSocket::sendTo");
 		return -SocketUtil::getLastError();
 	}
 	else
 	{
-		return byteSentCount;
+		return sent_length;
 	}
 }
 
-
+// UDP 통신의 recvfrom 함수 interfacing
+// SocketAddress를 사용한다.
+// data를 통해 데이터를 받아온다.
+// max_length에는 받아올 최대 길이를 지정한다.
 int UDPSocket::receiveFrom(void* data, int max_length, SocketAddress& from_addr)
 {
 	socklen_t fromLength = from_addr.getSize();
 	
-	int readByteCount = ::recvfrom(_socket, static_cast<char*>(data), max_length, 0, &from_addr._sockaddr, &fromLength);
-	if (readByteCount >= 0)
+	int read_length = 
+		::recvfrom(
+			_socket,
+			static_cast<char*>(data),
+			max_length, 0, &from_addr._sockaddr, &fromLength);
+
+	if (read_length >= 0)
 	{
-		return readByteCount;
+		return read_length;
 	}
 	else
 	{
@@ -63,9 +81,8 @@ int UDPSocket::receiveFrom(void* data, int max_length, SocketAddress& from_addr)
 		}
 		else if (error == WSAECONNRESET)
 		{
-			//this can happen if a client closed and we haven't DC'd yet.
-			//this is the ICMP message being sent back saying the port on that computer is closed
-			//LOG( "Connection reset from %s", outFromAddress.ToString().c_str() );
+			// 이 error는 client에서 socket이 closed 되었고,
+			// 현재 호스트에서는 연결이 끊기지 않았을 때 발생한다.
 			return -WSAECONNRESET;
 		}
 		else

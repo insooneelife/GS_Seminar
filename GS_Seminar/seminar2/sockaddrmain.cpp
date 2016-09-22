@@ -46,7 +46,7 @@ using namespace std;
 // struct sockaddr_in address;
 // memset((char *)&address, 0, sizeof(address));
 // address.sin_family = AF_INET;
-// address.sin_port = htons(Port);
+// address.sin_port = 8000;
 // address.sin_addr.s_addr = inet_addr(IP.c_str());
 
 // address를 (struct sockaddr*) 타입으로 강제 형변환 하여 sockaddr의 내부 값을 채운다.
@@ -197,7 +197,5 @@ int main()
 	//_ex2::test();
 	_ex3::test();
 	
-	
-
 	return 0;
 }

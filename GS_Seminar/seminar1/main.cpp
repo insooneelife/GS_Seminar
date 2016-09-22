@@ -25,26 +25,3 @@ int main(int argc, char * argv[])
 
 	return 0;
 }
-
-/*
-
-struct temp
-{
-unsigned short data;
-unsigned char arr[6];
-};
-
-struct temp_in
-{
-short   data;
-
-unsigned short port;
-unsigned char a;
-unsigned char b;
-unsigned char c;
-unsigned char d;
-//IN_ADDR sin_addr;
-//char sin_zero[8];
-};
-
-*/

@@ -4,6 +4,7 @@
 #include <iostream>
 using namespace std;
 
+// SocketAddress를 사용자 입장에서 가장 편한 문자열을 통해 생성시키는 함수
 SocketAddress* SocketAddress::createFromString(const string& addr)
 {
 	auto pos = addr.find_last_of(':');
@@ -49,7 +50,7 @@ SocketAddress* SocketAddress::createFromString(const string& addr)
 }
 
 
-
+// SocketAddress에 어떤 정보가 들어있는지 사용자 입장에서 편하도록 문자열로 만들어 반환
 std::string	SocketAddress::toString() const
 {
 #if _WIN32

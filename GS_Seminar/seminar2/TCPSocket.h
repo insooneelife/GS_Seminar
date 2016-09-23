@@ -10,8 +10,10 @@
 class TCPSocket
 {
 public:
+	// TCP socketÀÇ »ı¼º
 	static TCPSocket*				create(SocketUtil::AddressFamily family);
 	~TCPSocket();
+
 	int								connect(const SocketAddress& address);
 	int								bind(const SocketAddress& to_addr);
 	int								listen(int back_num = 32);

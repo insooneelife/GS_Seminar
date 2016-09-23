@@ -1,4 +1,5 @@
 #include "SocketUtil.h"
+#include <iostream>
 
 bool SocketUtil::staticInit()
 {
@@ -38,10 +39,9 @@ void SocketUtil::reportError( const char* inOperationDesc )
 				  (LPTSTR) &lpMsgBuf,
 				  0, NULL );
 	
-	
-	//LOG( "Error %s: %d- %s", inOperationDesc, errorNum, lpMsgBuf );
+	log( "Error %s: %d - %s", inOperationDesc, errorNum, lpMsgBuf );
 #else
-	LOG( "Error: %hs", inOperationDesc );
+	log( "Error: %hs", inOperationDesc );
 #endif
 }
 
@@ -53,3 +53,22 @@ int SocketUtil::getLastError()
 	return errno;
 #endif
 }
+
+void SocketUtil::log(const char* inFormat, ...)
+{
+	//not thread safe...
+	static char temp[4096];
+
+	va_list args;
+	va_start(args, inFormat);
+
+#if _WIN32
+	_vsnprintf_s(temp, 4096, 4096, inFormat, args);
+#else
+	vsnprintf(temp, 4096, inFormat, args);
+#endif
+	OutputDebugString(temp);
+	OutputDebugString("\n");
+	std::cout << temp << std::endl;
+}
+

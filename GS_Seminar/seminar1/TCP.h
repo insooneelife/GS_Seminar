@@ -2,6 +2,26 @@
 
 
 // TCP
+// TCP 통신은 전화기와 굉장히 흡사한 과정으로 이루어진다.
+// 그러므로 전화를 통해 TCP의 동작원리를 설명하고자 한다.
+
+// 전화를 거는 과정을 생각해보자.
+
+// 수신자							송신자
+//
+// 전화기 구매					전화기 구매	
+// 전화번호 등록					전화번호 입력 && 전화를 건다.
+// 전화기를 전화 케이블에 연결		통화한다.
+// 전화 벨이 울리면 수화기를 든다.	
+// 통화한다.
+
+// Server						Client
+// 1. socket 생성				1. socket 생성
+// 2. bind						4. connect
+// 3. listen					6. send/recv
+// 5. accept					
+// 6. send/recv
+
 
 #include <string>
 #include <iostream>

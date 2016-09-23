@@ -25,4 +25,5 @@ public:
 	// 윈도우 socket 에러 처리
 	static void			reportError( const char* inOperationDesc );
 	static int			getLastError();
+	static void			log(const char* inFormat, ...);
 };

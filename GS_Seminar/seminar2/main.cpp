@@ -90,7 +90,7 @@ namespace tcp
 	{
 		cout << "TCP Client start!" << endl;
 
-		// UDP socket 积己
+		// TCP socket 积己
 		TCPSocket* tcp_client = TCPSocket::create(SocketUtil::AddressFamily::INET);
 
 		// 焊尘 林家
@@ -100,7 +100,7 @@ namespace tcp
 		tcp_client->connect(*to_address);
 
 		// send
-		std::string message = "Hello UDP world!";
+		std::string message = "Hello TCP world!";
 		tcp_client->send(message.c_str(), message.size());
 
 		delete tcp_client;

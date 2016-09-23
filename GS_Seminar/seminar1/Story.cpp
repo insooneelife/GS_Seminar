@@ -86,6 +86,8 @@
 // Application 수준에서의 종착점, (전화기와 비슷한 역할을 한다.)
 // Transport layer에 접근하기 위한 표준된 방법.
 
+/*
+
 #include <iostream>
 #include <Windows.h>
 #include <WinSock2.h>
@@ -166,3 +168,5 @@ int main()
 
 	return 0;
 }
+
+*/

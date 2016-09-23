@@ -25,7 +25,8 @@
     <ClCompile Include="seminar1\Story.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="seminar2\sockaddrmain.cpp">
+    <ClCompile Include="seminar2\main.cpp" />
+    <ClCompile Include="seminar2\sockaddrexamples.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="seminar2\SocketAddress.cpp">
@@ -40,7 +41,6 @@
     <ClCompile Include="seminar2\UDPSocket.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="UDPmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="seminar1\TCP.h">

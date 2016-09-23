@@ -1,3 +1,6 @@
+#pragma once
+
+
 // TCP
 
 #include <string>
@@ -12,6 +15,116 @@ using namespace std;
 
 namespace _ex2
 {
-	
+	const int BufferSize = 256;
+	const int Port = 10000;
+	const std::string IP = "127.0.0.1";
+
+	// window에서 socket을 사용하기 위한 초기작업
+	void initWindowSocket()
+	{
+		WSADATA wsa;
+		if (WSAStartup(MAKEWORD(2, 2), &wsa) != NO_ERROR)
+			cout << "실패. error code : " << WSAGetLastError() << endl;
+	}
+
+	// UDP socket 생성 과정
+	SOCKET createSocket()
+	{
+		SOCKET sock;
+		// UDP socket 생성
+		if ((sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET)
+			cout << "socket() 생성 실패. error code : " << WSAGetLastError() << endl;
+		return sock;
+	}
+
+	void TCPServer()
+	{
+		cout << "TCP Server" << endl;
+
+		// Window socket 초기화
+		initWindowSocket();
+
+
+		char buffer[128];
+		struct sockaddr_in server_addr, client_addr;
+		char temp[20];
+		SOCKET server_socket, client_socket;
+		int len, msg_size;
+
+		
+		server_socket = createSocket();
+		
+		memset(&server_addr, 0x00, sizeof(server_addr));
+		server_addr.sin_family = AF_INET;
+		server_addr.sin_port = htons(Port);
+		InetPton(AF_INET, IP.c_str(), &(server_addr.sin_addr.s_addr));
+
+		if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) <0)
+		{
+			printf("Server : Can't bind local address.\n");
+			exit(0);
+		}
+
+		//소켓을 수동 대기모드로 설정
+		if (listen(server_socket, 5) < 0)
+		{
+			printf("Server : Can't listening connect.\n");
+			exit(0);
+		}
+
+		memset(buffer, 0x00, sizeof(buffer));
+		printf("Server : wating connection request.\n");
+		len = sizeof(client_addr);
+		while (1)
+		{
+			client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &len);
+			if (client_socket < 0)
+			{
+				printf("Server: accept failed.\n");
+				exit(0);
+			}
+			inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, temp, sizeof(temp));
+			printf("Server : %s client connected.\n", temp);
+
+			msg_size = recv(client_socket, buffer, 1024, 0);
+		}
+
+
+		closesocket(server_socket);
+		WSACleanup();
+	}
+
+	void TCPClient()
+	{
+		cout << "TCP Client" << endl;
+
+		// Window socket 초기화
+		initWindowSocket();
+
+		SOCKET socket = createSocket();
+
+		struct sockaddr_in address;
+		memset((char *)&address, 0, sizeof(address));
+		address.sin_family = AF_INET;
+		address.sin_port = htons(Port);
+		InetPton(AF_INET, IP.c_str(), &(address.sin_addr.s_addr));
+
+		if (SOCKET_ERROR == connect(socket, (struct sockaddr*)&address, sizeof(address)))
+		{
+			cout << "접속 실패"<<endl;
+			exit(1);
+		}
+
+		std::string message = "Hello TCP world!";
+		int bytes_sent = send(socket, message.c_str(), message.length(), 0);
+		if (bytes_sent < 0)
+		{
+			cout << "TCPSocket::send error" << endl;
+			exit(1);
+		}
+
+		closesocket(socket);
+		WSACleanup();
+	}
 }
 

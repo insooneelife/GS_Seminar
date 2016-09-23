@@ -93,6 +93,15 @@ namespace _ex1
 		a.data = 10;
 		memset(a.arr, 0, 6);
 
+		// reinterpret_cast는 c++의 가장 위험한 casting 방법으로 바이트 단위로 메모리를 복사해 버린다(타입에 상관없이).
+		// 추가 내용
+		// c스타일의 casting은 여러가지로 문제가 많은데,
+		// 여러가지 스타일의 casting을 모두 포함하고 있기 때문이다.
+		// c++는 c의 casting이 포함하는 스타일을 4개로 분류한다.
+		// static_cast
+		// const_cast
+		// dynamic_cast
+		// reinterpret_cast
 		addr_in& aref = *reinterpret_cast<addr_in*>(&a);
 
 		aref.data = 11;
@@ -180,9 +189,11 @@ namespace _ex3
 		string ip = "192.211.128.111";
 		string port = "8000";
 
+		// 이것도 불편하니
 		SocketAddress a1(htonl(inet_addr(ip.c_str())), stoi(port));
 		cout << a1.toString() << endl;
 
+		// 이렇게 사용하자
 		SocketAddress* a2 = SocketAddress::createFromString(ip + ":" + port);
 		cout << a2->toString() << endl;
 

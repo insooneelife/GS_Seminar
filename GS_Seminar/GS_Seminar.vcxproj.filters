@@ -7,9 +7,6 @@
     <Filter Include="seminar2">
       <UniqueIdentifier>{fbaf670d-f3a3-47d7-81d7-5688d7ec785a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="seminar2\Socket">
-      <UniqueIdentifier>{81e0d481-e20d-4447-a665-41170774fa73}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="seminar1\main.cpp">
@@ -18,22 +15,22 @@
     <ClCompile Include="seminar1\Story.cpp">
       <Filter>seminar1</Filter>
     </ClCompile>
-    <ClCompile Include="UDPmain.cpp">
+    <ClCompile Include="seminar2\SocketAddress.cpp">
       <Filter>seminar2</Filter>
     </ClCompile>
-    <ClCompile Include="seminar2\SocketAddress.cpp">
-      <Filter>seminar2\Socket</Filter>
-    </ClCompile>
     <ClCompile Include="seminar2\SocketUtil.cpp">
-      <Filter>seminar2\Socket</Filter>
+      <Filter>seminar2</Filter>
     </ClCompile>
     <ClCompile Include="seminar2\TCPSocket.cpp">
-      <Filter>seminar2\Socket</Filter>
+      <Filter>seminar2</Filter>
     </ClCompile>
     <ClCompile Include="seminar2\UDPSocket.cpp">
-      <Filter>seminar2\Socket</Filter>
+      <Filter>seminar2</Filter>
     </ClCompile>
-    <ClCompile Include="seminar2\sockaddrmain.cpp">
+    <ClCompile Include="seminar2\sockaddrexamples.cpp">
+      <Filter>seminar2</Filter>
+    </ClCompile>
+    <ClCompile Include="seminar2\main.cpp">
       <Filter>seminar2</Filter>
     </ClCompile>
   </ItemGroup>
@@ -45,16 +42,16 @@
       <Filter>seminar1</Filter>
     </ClInclude>
     <ClInclude Include="seminar2\SocketAddress.h">
-      <Filter>seminar2\Socket</Filter>
+      <Filter>seminar2</Filter>
     </ClInclude>
     <ClInclude Include="seminar2\SocketUtil.h">
-      <Filter>seminar2\Socket</Filter>
+      <Filter>seminar2</Filter>
     </ClInclude>
     <ClInclude Include="seminar2\TCPSocket.h">
-      <Filter>seminar2\Socket</Filter>
+      <Filter>seminar2</Filter>
     </ClInclude>
     <ClInclude Include="seminar2\UDPSocket.h">
-      <Filter>seminar2\Socket</Filter>
+      <Filter>seminar2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

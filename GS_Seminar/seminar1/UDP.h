@@ -1,3 +1,4 @@
+#pragma once
 // UDP
 // UDP 통신은 편지와 굉장히 흡사한 과정으로 이루어진다.
 // 그러므로 편지를 통해 UDP의 동작원리를 설명하고자 한다.
@@ -135,7 +136,8 @@ namespace _ex1
 		memset((char *)&otherAddress, 0, sizeof(otherAddress));
 		otherAddress.sin_family = AF_INET;
 		otherAddress.sin_port = htons(Port);
-		otherAddress.sin_addr.s_addr = inet_addr(IP.c_str());
+		InetPton(AF_INET, IP.c_str(), &(otherAddress.sin_addr.s_addr));
+
 
 		// 통신 시작
 		while (1)
@@ -168,8 +170,10 @@ namespace _ex1
 		// Address 구조체 초기화
 		struct sockaddr_in myAddress;
 		myAddress.sin_family = AF_INET;
-		myAddress.sin_addr.s_addr = inet_addr(IP.c_str());
 		myAddress.sin_port = htons(Port);
+		InetPton(AF_INET, IP.c_str(), &(myAddress.sin_addr.s_addr));
+
+		
 
 		// Socket에 주소 할당
 		if (bind(mySocket, (struct sockaddr*)&myAddress, sizeof(myAddress)) == SOCKET_ERROR)
@@ -185,6 +189,9 @@ namespace _ex1
 			// Client로 message 송신
 			sendProcess(&myAddress, mySocket, "SERVER MSG");
 		}
+
+		closesocket(mySocket);
+		WSACleanup();
 	}
 }
 

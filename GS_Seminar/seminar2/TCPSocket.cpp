@@ -16,6 +16,18 @@ TCPSocket* TCPSocket::create(SocketUtil::AddressFamily family)
 	}
 }
 
+int TCPSocket::bind(const SocketAddress& address)
+{
+	int error = ::bind(_socket, &address._sockaddr, address.getSize());
+	if (error != 0)
+	{
+		SocketUtil::reportError("TCPSocket::bind");
+		return SocketUtil::getLastError();
+	}
+
+	return NO_ERROR;
+}
+
 int TCPSocket::connect(const SocketAddress& address)
 {
 	int err = ::connect(_socket, &address._sockaddr, address.getSize());
@@ -77,17 +89,7 @@ int32_t	TCPSocket::receive(void* data, size_t length)
 	return bytes_received;
 }
 
-int TCPSocket::bind(const SocketAddress& address)
-{
-	int error = ::bind(_socket, &address._sockaddr, address.getSize());
-	if (error != 0)
-	{
-		SocketUtil::reportError("TCPSocket::bind");
-		return SocketUtil::getLastError();
-	}
 
-	return NO_ERROR;
-}
 
 TCPSocket::~TCPSocket()
 {

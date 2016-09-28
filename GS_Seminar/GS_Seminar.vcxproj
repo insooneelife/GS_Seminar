@@ -19,53 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="seminar1\main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="seminar1\Story.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="seminar2\main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="seminar2\sockaddrexamples.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="seminar2\SocketAddress.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="seminar2\SocketUtil.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="seminar2\TCPSocket.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="seminar2\UDPSocket.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="seminar3\main.cpp" />
+    <ClCompile Include="seminar3\Socket\SocketAddress.cpp" />
+    <ClCompile Include="seminar3\Socket\SocketUtil.cpp" />
+    <ClCompile Include="seminar3\Socket\TCPSocket.cpp" />
+    <ClCompile Include="seminar3\Socket\UDPSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="seminar1\TCP.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="seminar1\UDP.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="seminar2\SocketAddress.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="seminar2\SocketUtil.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="seminar2\TCPSocket.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="seminar2\UDPSocket.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="과제.txt" />
+    <ClInclude Include="seminar3\Socket\SocketAddress.h" />
+    <ClInclude Include="seminar3\Socket\SocketUtil.h" />
+    <ClInclude Include="seminar3\Socket\TCPSocket.h" />
+    <ClInclude Include="seminar3\Socket\UDPSocket.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8E433FC7-13B6-43CE-9497-289F65DF7A45}</ProjectGuid>

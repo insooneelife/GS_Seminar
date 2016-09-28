@@ -1,62 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="seminar1">
-      <UniqueIdentifier>{c288fadb-3f98-4970-aeb4-76871bde6845}</UniqueIdentifier>
+    <Filter Include="seminar3">
+      <UniqueIdentifier>{62c674b7-43bf-44fa-b9cd-0606d46e9024}</UniqueIdentifier>
     </Filter>
-    <Filter Include="seminar2">
-      <UniqueIdentifier>{fbaf670d-f3a3-47d7-81d7-5688d7ec785a}</UniqueIdentifier>
+    <Filter Include="seminar3\Socket">
+      <UniqueIdentifier>{88e490b5-02b5-4739-86ae-4edc6cc9143c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="seminar1\main.cpp">
-      <Filter>seminar1</Filter>
+    <ClCompile Include="seminar3\Socket\SocketAddress.cpp">
+      <Filter>seminar3\Socket</Filter>
     </ClCompile>
-    <ClCompile Include="seminar1\Story.cpp">
-      <Filter>seminar1</Filter>
+    <ClCompile Include="seminar3\Socket\SocketUtil.cpp">
+      <Filter>seminar3\Socket</Filter>
     </ClCompile>
-    <ClCompile Include="seminar2\SocketAddress.cpp">
-      <Filter>seminar2</Filter>
+    <ClCompile Include="seminar3\Socket\TCPSocket.cpp">
+      <Filter>seminar3\Socket</Filter>
     </ClCompile>
-    <ClCompile Include="seminar2\SocketUtil.cpp">
-      <Filter>seminar2</Filter>
+    <ClCompile Include="seminar3\Socket\UDPSocket.cpp">
+      <Filter>seminar3\Socket</Filter>
     </ClCompile>
-    <ClCompile Include="seminar2\TCPSocket.cpp">
-      <Filter>seminar2</Filter>
-    </ClCompile>
-    <ClCompile Include="seminar2\UDPSocket.cpp">
-      <Filter>seminar2</Filter>
-    </ClCompile>
-    <ClCompile Include="seminar2\sockaddrexamples.cpp">
-      <Filter>seminar2</Filter>
-    </ClCompile>
-    <ClCompile Include="seminar2\main.cpp">
-      <Filter>seminar2</Filter>
+    <ClCompile Include="seminar3\main.cpp">
+      <Filter>seminar3</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="seminar1\TCP.h">
-      <Filter>seminar1</Filter>
+    <ClInclude Include="seminar3\Socket\SocketAddress.h">
+      <Filter>seminar3\Socket</Filter>
     </ClInclude>
-    <ClInclude Include="seminar1\UDP.h">
-      <Filter>seminar1</Filter>
+    <ClInclude Include="seminar3\Socket\SocketUtil.h">
+      <Filter>seminar3\Socket</Filter>
     </ClInclude>
-    <ClInclude Include="seminar2\SocketAddress.h">
-      <Filter>seminar2</Filter>
+    <ClInclude Include="seminar3\Socket\TCPSocket.h">
+      <Filter>seminar3\Socket</Filter>
     </ClInclude>
-    <ClInclude Include="seminar2\SocketUtil.h">
-      <Filter>seminar2</Filter>
+    <ClInclude Include="seminar3\Socket\UDPSocket.h">
+      <Filter>seminar3\Socket</Filter>
     </ClInclude>
-    <ClInclude Include="seminar2\TCPSocket.h">
-      <Filter>seminar2</Filter>
-    </ClInclude>
-    <ClInclude Include="seminar2\UDPSocket.h">
-      <Filter>seminar2</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="과제.txt">
-      <Filter>seminar2</Filter>
-    </Text>
   </ItemGroup>
 </Project>

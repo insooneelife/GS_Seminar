@@ -69,8 +69,6 @@ int UDPSocket::receiveFrom(void* data, int max_length, SocketAddress& from_addr)
 			static_cast<char*>(data),
 			max_length, 0, &from_addr._sockaddr, &fromLength);
 
-
-
 	if (read_length >= 0)
 	{
 		return read_length;
@@ -80,7 +78,6 @@ int UDPSocket::receiveFrom(void* data, int max_length, SocketAddress& from_addr)
 		int error = SocketUtil::getLastError();
 		if (error == WSAEWOULDBLOCK)
 		{
-			//SocketUtil::log("WSAEWOULDBLOCK");
 			return 0;
 		}
 		else if (error == WSAECONNRESET)
@@ -89,16 +86,12 @@ int UDPSocket::receiveFrom(void* data, int max_length, SocketAddress& from_addr)
 			// (중요) 하지만 sendTo를 하고 있어야 한다
 			// 이 error는 client에서 socket이 closed 되었고,
 			// 현재 호스트에서는 연결이 끊기지 않았을 때 발생한다.
-			//std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
-			//std::cout.flush();
 			SocketUtil::log("client connection closed!");
 			SocketUtil::reportError("client connection closed!");
 			return -WSAECONNRESET;
 		}
 		else
 		{
-			//std::cout << "error!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-			//std::cout.flush();
 			SocketUtil::reportError("UDPSocket::ReceiveFrom");
 			return -error;
 		}

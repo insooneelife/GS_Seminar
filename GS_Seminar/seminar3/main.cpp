@@ -1,9 +1,12 @@
 #include <iostream>
 #include <memory>
+#include <vector>
 #include "Socket/UDPSocket.h"
 #include "Socket/TCPSocket.h"
-using namespace std;
 
+#include <conio.h>
+
+using namespace std;
 
 // TCP blocking example
 namespace tcpblocking
@@ -12,96 +15,185 @@ namespace tcpblocking
 	{
 		cout << "TCP chat server start" << endl;
 		unique_ptr<TCPSocket> socket(TCPSocket::create(SocketUtil::AddressFamily::INET));
-		unique_ptr<SocketAddress> address(SocketAddress::createFromString(port));
-		socket->bind(*address);
+		SocketAddress address(INADDR_ANY, atoi(port.c_str()));
+		socket->bind(address);
 		socket->listen(32);
 
-		SocketAddress client_address;
-		cout << "blocked in accept" << endl;
-		socket->accept(client_address);
+		vector<unique_ptr<TCPSocket>> clients;
 
-		string message = "here you go, the message from server!";
-		socket->send(message.c_str(), message.size());
+		while (1)
+		{
+			SocketAddress client_address;
+			cout << "blocked in accept" << endl;
+
+			clients.emplace_back(socket->accept(client_address));
+
+			for (auto c = begin(clients); c != end(clients); ++c)
+			{
+				char buffer[10000] = { 0 };
+				(*c)->receive(buffer, 10000);
+				cout << buffer << endl;
+			}
+		}
 	}
-
 
 	void Client(const string& address)
 	{
+		cout << "TCP chat client start" << endl;
 		unique_ptr<TCPSocket> socket(TCPSocket::create(SocketUtil::AddressFamily::INET));
 		unique_ptr<SocketAddress> server_address(SocketAddress::createFromString(address));
 		
 		socket->connect(*server_address);
-		string message = "here you go, the message from server!";
-		socket->send(message.c_str(), message.size());
+		while (1)
+		{
+			string message = "here you go, the message from client!";
+			socket->send(message.c_str(), message.size());
+		}
 	}
 }
 
-
-// UDP Chat Server
-void Server(const string& server_addr)
+namespace udpblocking
 {
-	cout << "Chat Server start@" << endl;
-
-	unique_ptr<UDPSocket> socket(UDPSocket::create(SocketUtil::AddressFamily::INET));
-	unique_ptr<SocketAddress> address(SocketAddress::createFromString(server_addr));
-	socket->bind(*address);
-	socket->setNoneBlockingMode(true);
-
-	while (1)
+	void Server(const string& port)
 	{
-		SocketAddress from_address;
-		char buffer[128] = { 0 };
-		socket->receiveFrom(buffer, 128, from_address);
+		cout << "UDP blocking server start" << endl;
+		unique_ptr<UDPSocket> socket(UDPSocket::create(SocketUtil::AddressFamily::INET));
+		SocketAddress address(INADDR_ANY, atoi(port.c_str()));
+		socket->bind(address);
 
-		cout << "recv from : " << from_address.toString() << "   data : " << buffer << endl;;
+		while (1)
+		{
+			SocketAddress client_address;
+			char buffer[1024] = { 0 };
+			socket->receiveFrom(buffer, 1024, client_address);
 
-		std::string message = "asshole";
-		socket->sendTo(message.c_str(), message.size(), from_address);
+			cout << "[server received] address : "
+				<< client_address.toString()
+				<< "   data : "
+				<< buffer << endl;
+
+			string message = "hello! client im server!";
+			socket->sendTo(message.c_str(), message.size(), client_address);
+
+			cout << "process in game logic.." << endl;
+		}
+	}
+
+
+	void Client(const string& server_addr)
+	{
+		cout << "UDP blocking client start" << endl;
+		unique_ptr<UDPSocket> socket(UDPSocket::create(SocketUtil::AddressFamily::INET));
+		SocketAddress address;
+		socket->bind(address);
+
+		unique_ptr<SocketAddress> server_address(SocketAddress::createFromString(server_addr));
+
+		int i = 0;
+		while (1)
+		{
+			if ((i++) % 20 == 0)
+			{
+				string message = "hello! im client!";
+				socket->sendTo(message.c_str(), message.size(), *server_address);
+
+				SocketAddress temp;
+				char buffer[1024] = { 0 };
+				socket->receiveFrom(buffer, 1024, temp);
+
+				cout << "[client received] address : "
+					<< temp.toString()
+					<< "   data : "
+					<< buffer << endl;
+			}
+			Sleep(50);
+		}
 	}
 }
 
-// UDP Chat Client
-void Client(const string& server_addr)
+
+namespace chat
 {
-	cout << "Chat Client start@" << endl;
-
-	unique_ptr<UDPSocket> socket(UDPSocket::create(SocketUtil::AddressFamily::INET));
-
-	SocketAddress address;
-	socket->bind(address);
-	std::cout<<"address : " << address.toString();
-
-	socket->setNoneBlockingMode(true);
-
-	unique_ptr<SocketAddress> server_address(SocketAddress::createFromString(server_addr));
-
-	// Send login packet
-	std::string message = "<command>:login";
-	socket->sendTo(message.c_str(), message.size(), *server_address);
-
-	int i = 0;
-	while (i++ <10)
+	// UDP Chat Server
+	void Server(const string& port)
 	{
-		//cin >> message;
+		cout << "Chat Server start" << endl;
+		unique_ptr<UDPSocket> socket(UDPSocket::create(SocketUtil::AddressFamily::INET));
+		SocketAddress address(INADDR_ANY, atoi(port.c_str()));
+		socket->bind(address);
+		socket->setNoneBlockingMode(true);
 
-		//if (message == "quit")
-			//break;
+		while (1)
+		{
+			SocketAddress client_address;
+			char buffer[1024] = { 0 };
 
-		socket->sendTo(message.c_str(), message.size(), *server_address);
+			int readByteCount = socket->receiveFrom(buffer, 1024, client_address);
+			if (readByteCount == 0)
+			{
+				//nothing to read
+			}
+			else if (readByteCount == -WSAECONNRESET)
+			{
+				// port closed on other end, so DC this person immediately
+			}
+			else if (readByteCount > 0)
+			{
+				cout << "[server received] address : "
+					<< client_address.toString()
+					<< "   data : "
+					<< buffer << endl;
+
+				std::string message = "asshole";
+				socket->sendTo(message.c_str(), message.size(), client_address);
+			}
+			else
+			{
+				//uhoh, error? exit or just keep going?
+			}
+
+			cout << "process in game logic" << endl;
+		}
 	}
 
-	
-	//closesocket(socket->_socket);
+	// UDP Chat Client
+	void Client(const string& server_addr)
+	{
+		cout << "UDP blocking client start" << endl;
+		unique_ptr<UDPSocket> socket(UDPSocket::create(SocketUtil::AddressFamily::INET));
+		SocketAddress address;
+		socket->bind(address);
+		socket->setNoneBlockingMode(true);
 
-	std::cout << "@@@";
+		unique_ptr<SocketAddress> server_address(SocketAddress::createFromString(server_addr));
 
-	
+		int i = 0;
+		while (1)
+		{
+			while (_kbhit()) {
+				char cur = _getch();
+				std::cout << cur;
+			}
 
-	// Send logout packet
-	//message = "<command>:logout";
-	//socket->sendTo(message.c_str(), message.size(), *server_address);
-	
+			if ((i++) % 20 == 0)
+			{
+				string message = "hello! im client!";
+				socket->sendTo(message.c_str(), message.size(), *server_address);
+
+				SocketAddress temp;
+				char buffer[1024] = { 0 };
+				socket->receiveFrom(buffer, 1024, temp);
+
+				cout << "[client received] address : "
+					<< temp.toString()
+					<< "   data : "
+					<< buffer << endl;
+			}
+
+		}
+	}
 }
+
 
 
 
@@ -110,10 +202,15 @@ int main(int argc, char * argv[])
 	// winsock ÃÊ±âÈ­
 	SocketUtil::staticInit();
 
-	tcpblocking::Client("127.0.0.1:8000");
-
-	//Server("127.0.0.1:8000");
 	//tcpblocking::Server("8000");
+	//tcpblocking::Client("127.0.0.1:8000");
+
+	//udpblocking::Server("8000");
+	//udpblocking::Client("127.0.0.1:8000");
+
+	chat::Server("8000");
+	//chat::Client("127.0.0.1:8000");
+	
 
 	/*if (argc == 3)
 	{

@@ -1,7 +1,37 @@
 #include <iostream>
 #include <memory>
 #include "Socket/UDPSocket.h"
+#include "Socket/TCPSocket.h"
 using namespace std;
+
+
+// TCP blocking example
+namespace tcpblocking
+{
+	void Server(const string& port)
+	{
+		cout << "TCP chat server start" << endl;
+		unique_ptr<TCPSocket> socket(TCPSocket::create(SocketUtil::AddressFamily::INET));
+		unique_ptr<SocketAddress> address(SocketAddress::createFromString(port));
+		socket->bind(*address);
+		socket->listen(32);
+
+		SocketAddress client_address;
+		cout << "blocked in accept" << endl;
+		socket->accept(client_address);
+
+		string message = "here you go, the message from server!";
+		socket->send(message.c_str(), message.size());
+	}
+
+
+	void Client(const string& address)
+	{
+		unique_ptr<TCPSocket> socket(TCPSocket::create(SocketUtil::AddressFamily::INET));
+		unique_ptr<SocketAddress> server_address(SocketAddress::createFromString(address));
+		
+	}
+}
 
 
 // UDP Chat Server
@@ -77,9 +107,9 @@ int main(int argc, char * argv[])
 	// winsock √ ±‚»≠
 	SocketUtil::staticInit();
 
-	Client("127.0.0.1:8000");
+	//Client("127.0.0.1:8000");
 
-	//Server("127.0.0.1:8000");
+	Server("127.0.0.1:8000");
 
 	/*if (argc == 3)
 	{

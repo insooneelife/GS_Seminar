@@ -30,6 +30,9 @@ namespace tcpblocking
 		unique_ptr<TCPSocket> socket(TCPSocket::create(SocketUtil::AddressFamily::INET));
 		unique_ptr<SocketAddress> server_address(SocketAddress::createFromString(address));
 		
+		socket->connect(*server_address);
+		string message = "here you go, the message from server!";
+		socket->send(message.c_str(), message.size());
 	}
 }
 
@@ -107,9 +110,10 @@ int main(int argc, char * argv[])
 	// winsock √ ±‚»≠
 	SocketUtil::staticInit();
 
-	//Client("127.0.0.1:8000");
+	tcpblocking::Client("127.0.0.1:8000");
 
-	Server("127.0.0.1:8000");
+	//Server("127.0.0.1:8000");
+	//tcpblocking::Server("8000");
 
 	/*if (argc == 3)
 	{

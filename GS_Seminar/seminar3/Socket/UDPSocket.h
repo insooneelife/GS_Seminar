@@ -6,6 +6,21 @@
 #include "SocketAddress.h"
 #include "SocketUtil.h"
 
+// UDP 통신은 편지에 비유할 수 있다.
+// packet -> 편지
+// socket -> 우체통
+// ip address -> 주소
+
+// UDP 통신은 다음과 같은 과정으로 이루어진다.
+//
+//	   Server								   Client
+//
+//	1. create socket(우체통)					1. create socket(우체통)
+//	2. bind(주소 등록)				 
+//	4. recvfrom(편지를 기다림)			<-		3. sendto(주소가 적힌 편지를 보냄)
+//	4. sendto(주소가 적힌 편지를 보냄)	->		5. recvfrom(편지를 기다림)
+//	5. close								6. close
+
 class UDPSocket
 {
 public:

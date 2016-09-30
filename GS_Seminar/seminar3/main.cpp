@@ -1,6 +1,9 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <queue>
+#include <unordered_map>
+#include <sstream>
 #include <conio.h>
 #include "Socket/UDPSocket.h"
 #include "Socket/TCPSocket.h"
@@ -78,6 +81,7 @@ namespace tcpblocking
 	}
 }
 
+// UDP blocking example
 namespace udpblocking
 {
 	// Udp socket에 경우, tcp와 달리 하나의 socket을 통해 여러 client들의 data를 읽어올 수 있기 때문에,
@@ -166,40 +170,102 @@ namespace udpblocking
 	}
 }
 
-
+// UDP non-blocking chat example
 namespace chat
 {
+	// 아래와 같은 문자열이 들어올 경우 특수한 동작을 수행하도록 한다.
+	
+	// Server의 client map에 새 client의 id와 주소 정보를 추가한다.
+	const string kLoginPacket = "<Login>";
+
+	// 접속이 성공적일 경우, client에게 아래 문자열을 보낸다.
+	const string kOkayPacket = "<Okay>";
+	
+
 	// UDP Chat Server
 	void Server(const string& port)
 	{
 		cout << "Chat Server start!" << endl;
+
+		// Udp socket을 만든다.
 		unique_ptr<UDPSocket> socket(UDPSocket::create(SocketUtil::AddressFamily::INET));
+		
+		// 자신의 주소를 socket에 등록한다.
 		SocketAddress address(INADDR_ANY, atoi(port.c_str()));
 		socket->bind(address);
 		socket->setNoneBlockingMode(true);
 
+		// Client들을 저장할 hash map
+		unordered_map<int, SocketAddress> clients;
+
+		// 주소로부터 id를 얻어야 하는 경우
+		unordered_map<SocketAddress, int> addressToID;
+
+		// Chat server를 위한 main loop
 		while (1)
 		{
+			// Client의 주소를 담을 임시 공간
 			SocketAddress client_address;
+
+			// Client로부터 받은 데이터를 담을 버퍼
 			char buffer[1024] = { 0 };
 
-			int readByteCount = socket->receiveFrom(buffer, 1024, client_address);
-			if (readByteCount == 0)
+			// Non-blocking mode의 socket에서는 recv함수의 return값을 보고
+			// 현재 어떤 상황인지 알 수 있다.
+			int read_bytes = socket->receiveFrom(buffer, 1024, client_address);
+			
+			// 읽을 것이 없었고 비동기 모드에 맞게 receiveFrom에서 block되지 않고 넘어간다.
+			if (read_bytes == 0)
 			{
 				// nothing to read
 			}
-			else if (readByteCount == -WSAECONNRESET)
+			// Client에서 socket이 닫혔음을 알리는 값이다.
+			// 이 값이 return 값으로 반환되기 위해서는,
+			// server 쪽에서 sendTo 함수를 통해 이 client에게 무언가를 보내야 한다.
+			else if (read_bytes == -WSAECONNRESET)
 			{
-				// port closed on other end, so DC this person immediately
+				cout <<"연결이 끊긴 client : "<< client_address.toString() << endl;
+
+				auto iter = addressToID.find(client_address);
+				int id = iter->second;
+				clients.erase(id);
+				addressToID.erase(client_address);
 			}
-			else if (readByteCount > 0)
+			// 읽을 data가 있을 경우 return 값으로 data의 크기가 반환된다.
+			else if (read_bytes > 0)
 			{
 				cout << "[server received] address : "
 					<< client_address.toString()
 					<< "   data : "
 					<< buffer << endl;
 
-				socket->sendTo(buffer, readByteCount, client_address);
+				// 받은 packet에 대한 처리
+				string data = buffer;
+				if (data == kLoginPacket)
+				{
+					// "<Login>" 형태의 문자열을 받을 경우, 이 client를 clients hashmap에 추가한다.
+					int client_num = clients.size();
+					clients.emplace(client_num + 1, client_address);
+					addressToID.emplace(client_address, client_num + 1);
+
+					// 성공적으로 접속되었음을 client에게 알린다.
+					socket->sendTo(kOkayPacket.c_str(), kOkayPacket.size(), client_address);
+				}
+				else
+				{
+					auto iter = addressToID.find(client_address);
+					int id = iter->second;
+
+					stringstream ss;
+					ss << id;
+					data = ss.str() + " : " + data;
+
+					// 모든 client에게 받은 packet(data)를 전달한다.
+					for (auto c : clients)
+					{
+						socket->sendTo(data.c_str(), data.size(), c.second);
+					}
+				}
 			}
 			else
 			{
@@ -214,24 +280,38 @@ namespace chat
 	void Client(const string& server_addr)
 	{
 		cout << "Chat Client start!" << endl;
+
+		// Socket을 만든다.
 		unique_ptr<UDPSocket> socket(UDPSocket::create(SocketUtil::AddressFamily::INET));
+		
+		// 자신의 주소를 등록한다.(선택)
 		SocketAddress address;
 		socket->bind(address);
-		socket->setNoneBlockingMode(true);
 
+		// Server의 주소를 생성한다.
 		unique_ptr<SocketAddress> server_address(SocketAddress::createFromString(server_addr));
 
+		// Keyboard 입력을 담을 buffer
 		char inputs[128] = { 0 };
 		char inputCur = 0;
 
+		// Server에 로그인 요청을 한다.
+		socket->sendTo(kLoginPacket.c_str(), kLoginPacket.size(), *server_address);
+
+		// Socket을 non-blocking mode로 바꾼다.
+		socket->setNoneBlockingMode(true);
+
 		while (1)
 		{
+			// Enter가 입력될 때까지 문자를 입력받는다.
+			// cin의 경우는 blocking io이기 때문에 사용하지 못한다.
 			if (_kbhit())
 			{
 				char ch = _getch();
 				inputs[inputCur++] = ch;
 				cout << ch;
 
+				// Enter 입력 시
 				if (ch == 13)
 				{
 					inputs[inputCur] = 0;
@@ -240,22 +320,18 @@ namespace chat
 				}
 			}
 
+			// Server로부터 데이터를 받는다.
 			SocketAddress temp;
 			char buffer[1024] = { 0 };
-			int readByteCount = socket->receiveFrom(buffer, 1024, temp);
+			int read_bytes = socket->receiveFrom(buffer, 1024, temp);
 
-			if (readByteCount == 0)
+			if (read_bytes == 0)
+			{}
+			else if (read_bytes == -WSAECONNRESET)
+			{}
+			else if (read_bytes > 0)
 			{
-			}
-			else if (readByteCount == -WSAECONNRESET)
-			{
-			}
-			else if (readByteCount > 0)
-			{
-				cout << "[client received] address : "
-					<< temp.toString()
-					<< "   data : "
-					<< buffer << endl;
+				cout << buffer << endl;
 			}
 			else
 			{
@@ -278,8 +354,8 @@ int main(int argc, char * argv[])
 	//udpblocking::Server("8000");
 	//udpblocking::Client("127.0.0.1:8000");
 
-	//chat::Server("8000");
-	chat::Client("127.0.0.1:8000");
+	chat::Server("8000");
+	//chat::Client("127.0.0.1:8000");
 
 
 	SocketUtil::cleanUp();

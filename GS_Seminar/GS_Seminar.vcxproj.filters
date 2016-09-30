@@ -42,4 +42,9 @@
       <Filter>seminar3\Socket</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="seminar3\과제.txt">
+      <Filter>seminar3</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

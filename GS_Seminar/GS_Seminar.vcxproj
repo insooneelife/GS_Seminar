@@ -36,6 +36,9 @@
     <ClInclude Include="seminar3\Socket\TCPSocket.h" />
     <ClInclude Include="seminar3\Socket\UDPSocket.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="seminar3\과제.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8E433FC7-13B6-43CE-9497-289F65DF7A45}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

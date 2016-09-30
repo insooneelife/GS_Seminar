@@ -14,6 +14,8 @@ seminar3 폴더 안에 필요한 파일들이 있습니다.
 4. chat client 프로그램 중 하나를 종료시킨 후,
    다른 client로 문자 입력 후 enter를 눌러 보면
    server에서 종료된 client에게 send를 하게 되므로 에러 메시지가 발생한다.
+   계속 메시지를 보내면 계속 종료된 client에게 data를 보내기 때문에 계속 에러 메시지가 발행한다.
+    (4번 스크린샷 확인해보기)
 
 5. client의 종료 시, server의 client map에서 client를 제거하여 위 문제를 해결 해 보자.
 	(5번 스크린샷들 확인해보기)

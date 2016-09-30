@@ -225,11 +225,6 @@ namespace chat
 			else if (read_bytes == -WSAECONNRESET)
 			{
 				cout <<"연결이 끊긴 client : "<< client_address.toString() << endl;
-
-				auto iter = addressToID.find(client_address);
-				int id = iter->second;
-				clients.erase(id);
-				addressToID.erase(client_address);
 			}
 			// 읽을 data가 있을 경우 return 값으로 data의 크기가 반환된다.
 			else if (read_bytes > 0)
@@ -253,13 +248,6 @@ namespace chat
 				}
 				else
 				{
-					auto iter = addressToID.find(client_address);
-					int id = iter->second;
-
-					stringstream ss;
-					ss << id;
-					data = ss.str() + " : " + data;
-
 					// 모든 client에게 받은 packet(data)를 전달한다.
 					for (auto c : clients)
 					{
@@ -354,8 +342,8 @@ int main(int argc, char * argv[])
 	//udpblocking::Server("8000");
 	//udpblocking::Client("127.0.0.1:8000");
 
-	chat::Server("8000");
-	//chat::Client("127.0.0.1:8000");
+	//chat::Server("8000");
+	chat::Client("127.0.0.1:8000");
 
 
 	SocketUtil::cleanUp();

@@ -82,7 +82,6 @@ int UDPSocket::receiveFrom(void* data, int max_length, SocketAddress& from_addr)
 		}
 		else if (error == WSAECONNRESET)
 		{
-
 			// (중요) 하지만 sendTo를 하고 있어야 한다
 			// 이 error는 client에서 socket이 closed 되었고,
 			// 현재 호스트에서는 연결이 끊기지 않았을 때 발생한다.

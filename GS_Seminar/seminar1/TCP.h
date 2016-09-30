@@ -103,6 +103,8 @@ namespace _ex2
 				printf("Server: accept failed.\n");
 				exit(0);
 			}
+
+
 			inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, temp, sizeof(temp));
 			printf("Server : %s client connected.\n", temp);
 

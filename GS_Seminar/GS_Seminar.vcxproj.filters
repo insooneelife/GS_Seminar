@@ -24,6 +24,9 @@
     <ClCompile Include="seminar3\main.cpp">
       <Filter>seminar3</Filter>
     </ClCompile>
+    <ClCompile Include="seminar3\practice.cpp">
+      <Filter>seminar3</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="seminar3\Socket\SocketAddress.h">

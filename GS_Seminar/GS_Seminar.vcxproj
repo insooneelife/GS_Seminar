@@ -19,7 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="seminar3\main.cpp" />
+    <ClCompile Include="seminar3\main.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="seminar3\practice.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="seminar3\Socket\SocketAddress.cpp" />
     <ClCompile Include="seminar3\Socket\SocketUtil.cpp" />
     <ClCompile Include="seminar3\Socket\TCPSocket.cpp" />

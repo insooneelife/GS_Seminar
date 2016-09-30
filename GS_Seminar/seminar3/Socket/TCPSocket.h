@@ -7,6 +7,15 @@
 #include "SocketAddress.h"
 #include "SocketUtil.h"
 
+//		Server		Client
+//
+//
+//
+//
+//
+//
+//
+
 class TCPSocket
 {
 public:

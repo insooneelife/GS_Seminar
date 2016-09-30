@@ -79,6 +79,7 @@ namespace tcp
 		// 새 클라이언트로부터 recieve
 		char buffer[128] = { 0 };
 		client->receive(buffer, 128);
+		
 		cout << "recv from : " << from_address.toString() << "   data : " << buffer << endl;;
 
 		delete tcp_socket;
@@ -102,6 +103,7 @@ namespace tcp
 		// send
 		std::string message = "Hello TCP world!";
 		tcp_client->send(message.c_str(), message.size());
+
 
 		delete tcp_client;
 		delete to_address;

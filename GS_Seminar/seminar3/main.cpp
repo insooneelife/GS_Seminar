@@ -1,12 +1,9 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <conio.h>
 #include "Socket/UDPSocket.h"
 #include "Socket/TCPSocket.h"
-
-#include <conio.h>
-#include <thread>
-
 using namespace std;
 
 // TCP blocking example
@@ -15,15 +12,22 @@ namespace tcpblocking
 	void Server(const string& port)
 	{
 		cout << "TCP chat server start" << endl;
+
+		// Tcp Socket을 만든다. 
 		unique_ptr<TCPSocket> socket(TCPSocket::create(SocketUtil::AddressFamily::INET));
 		
+		// Port 정보만 이용하여 주소를 만들고 socket에 등록한다.
+		// Port만 이용하는 이유는,
+		// 자기 자신의 ip를 socket에 등록하는 경우에 ip정보를 따로 받을 필요가 없기 때문이다. 
 		SocketAddress address(INADDR_ANY, atoi(port.c_str()));
 		socket->bind(address);
 		
+		// Socket을 수동 대기 모드로 변경시킨다.
+		// 최대 수용 인원은 32명
 		socket->listen(32);
 
+		// Tcp 통신의 경우 연결을 유지해야하는 
 		vector<unique_ptr<TCPSocket>> clients;
-
 		while (1)
 		{
 			SocketAddress client_address;
@@ -125,7 +129,7 @@ namespace chat
 	// UDP Chat Server
 	void Server(const string& port)
 	{
-		cout << "Chat Server start" << endl;
+		cout << "Chat Server start!" << endl;
 		unique_ptr<UDPSocket> socket(UDPSocket::create(SocketUtil::AddressFamily::INET));
 		SocketAddress address(INADDR_ANY, atoi(port.c_str()));
 		socket->bind(address);
@@ -159,14 +163,14 @@ namespace chat
 				// uhoh, error? exit or just keep going?
 			}
 
-			cout << "process in game logic" << endl;
+			// process other logics ..
 		}
 	}
 
 	// UDP Chat Client
 	void Client(const string& server_addr)
 	{
-		cout << "Chat Client start" << endl;
+		cout << "Chat Client start!" << endl;
 		unique_ptr<UDPSocket> socket(UDPSocket::create(SocketUtil::AddressFamily::INET));
 		SocketAddress address;
 		socket->bind(address);
@@ -235,25 +239,6 @@ int main(int argc, char * argv[])
 	chat::Client("127.0.0.1:8000");
 
 
-
-	/*if (argc == 3)
-	{
-		string str = argv[1];
-		string address = argv[2];
-		if (str == "Client")
-		{
-			Client(address);
-			return 0;
-		}
-		else if (str == "Server")
-		{
-			Server(address);
-			return 0;
-		}
-	}
-
-	std::cout << "input argument = \"Client\" ip:port  or  \"Server\" ip:port";
-	*/
 	SocketUtil::cleanUp();
 	return 0;
 }

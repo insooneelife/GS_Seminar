@@ -149,7 +149,6 @@ namespace _ex2
 int main()
 {
 	_ex1::example();
-	std::cout << _ex1::_buffer[0];
 	
 
 	return 0;

@@ -109,7 +109,7 @@ namespace udpblocking
 		socket->bind(address);
 
 		// 현재 socket을 non-blocking mode로 바꾼다.
-		//socket->setNoneBlockingMode(true);
+		socket->setNoneBlockingMode(true);
 
 		// 통신
 		while (1)
@@ -347,12 +347,6 @@ int main(int argc, char * argv[])
 {
 	// winsock 초기화
 	SocketUtil::staticInit();
-
-	//tcpblocking::Server("8000");
-	//tcpblocking::Client("127.0.0.1:8000");
-
-	//udpblocking::Server("8000");
-	//udpblocking::Client("127.0.0.1:8000");
 
 	chat::Server("8000");
 	//chat::Client("127.0.0.1:8000");

@@ -19,25 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="seminar3\main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="seminar3\practice.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="seminar3\Socket\SocketAddress.cpp" />
-    <ClCompile Include="seminar3\Socket\SocketUtil.cpp" />
-    <ClCompile Include="seminar3\Socket\TCPSocket.cpp" />
-    <ClCompile Include="seminar3\Socket\UDPSocket.cpp" />
+    <ClInclude Include="seminar4\MemoryBitStream.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="seminar3\Socket\SocketAddress.h" />
-    <ClInclude Include="seminar3\Socket\SocketUtil.h" />
-    <ClInclude Include="seminar3\Socket\TCPSocket.h" />
-    <ClInclude Include="seminar3\Socket\UDPSocket.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="seminar3\과제.txt" />
+    <ClCompile Include="seminar4\main.cpp" />
+    <ClCompile Include="seminar4\MemoryBitStream.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8E433FC7-13B6-43CE-9497-289F65DF7A45}</ProjectGuid>

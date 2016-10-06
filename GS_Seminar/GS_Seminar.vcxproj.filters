@@ -1,50 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="seminar3">
-      <UniqueIdentifier>{62c674b7-43bf-44fa-b9cd-0606d46e9024}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="seminar3\Socket">
-      <UniqueIdentifier>{88e490b5-02b5-4739-86ae-4edc6cc9143c}</UniqueIdentifier>
+    <Filter Include="seminar4">
+      <UniqueIdentifier>{78ea1c8f-eb36-421a-bf26-25b0bf47639b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="seminar3\Socket\SocketAddress.cpp">
-      <Filter>seminar3\Socket</Filter>
-    </ClCompile>
-    <ClCompile Include="seminar3\Socket\SocketUtil.cpp">
-      <Filter>seminar3\Socket</Filter>
-    </ClCompile>
-    <ClCompile Include="seminar3\Socket\TCPSocket.cpp">
-      <Filter>seminar3\Socket</Filter>
-    </ClCompile>
-    <ClCompile Include="seminar3\Socket\UDPSocket.cpp">
-      <Filter>seminar3\Socket</Filter>
-    </ClCompile>
-    <ClCompile Include="seminar3\main.cpp">
-      <Filter>seminar3</Filter>
-    </ClCompile>
-    <ClCompile Include="seminar3\practice.cpp">
-      <Filter>seminar3</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="seminar3\Socket\SocketAddress.h">
-      <Filter>seminar3\Socket</Filter>
-    </ClInclude>
-    <ClInclude Include="seminar3\Socket\SocketUtil.h">
-      <Filter>seminar3\Socket</Filter>
-    </ClInclude>
-    <ClInclude Include="seminar3\Socket\TCPSocket.h">
-      <Filter>seminar3\Socket</Filter>
-    </ClInclude>
-    <ClInclude Include="seminar3\Socket\UDPSocket.h">
-      <Filter>seminar3\Socket</Filter>
+    <ClInclude Include="seminar4\MemoryBitStream.h">
+      <Filter>seminar4</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="seminar3\과제.txt">
-      <Filter>seminar3</Filter>
-    </Text>
+    <ClCompile Include="seminar4\MemoryBitStream.cpp">
+      <Filter>seminar4</Filter>
+    </ClCompile>
+    <ClCompile Include="seminar4\main.cpp">
+      <Filter>seminar4</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

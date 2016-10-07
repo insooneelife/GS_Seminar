@@ -4,18 +4,50 @@
     <Filter Include="seminar4">
       <UniqueIdentifier>{78ea1c8f-eb36-421a-bf26-25b0bf47639b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="seminar4\MemoryStream">
+      <UniqueIdentifier>{65064e77-6f15-48a5-a0ed-b72ba1990774}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="seminar4\flatbuffers">
+      <UniqueIdentifier>{20b2be74-33a5-4dae-ab73-18a451ac4c99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="seminar4\flatbuffers\flatbuffers">
+      <UniqueIdentifier>{a4665076-6232-42b1-a2d2-3a854ab8822e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="seminar4\flatbuffers\resources">
+      <UniqueIdentifier>{fc4d085d-e3ce-4ecc-a229-9336488fd9dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="seminar4\MemoryBitStream.h">
-      <Filter>seminar4</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="seminar4\MemoryBitStream.cpp">
-      <Filter>seminar4</Filter>
-    </ClCompile>
     <ClCompile Include="seminar4\main.cpp">
       <Filter>seminar4</Filter>
     </ClCompile>
+    <ClCompile Include="seminar4\MemoryStream\MemoryBitStream.cpp">
+      <Filter>seminar4\MemoryStream</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="seminar4\MemoryStream\MemoryBitStream.h">
+      <Filter>seminar4\MemoryStream</Filter>
+    </ClInclude>
+    <ClInclude Include="seminar4\flatbuffers\flatbuffers\flatbuffers.h">
+      <Filter>seminar4\flatbuffers\flatbuffers</Filter>
+    </ClInclude>
+    <ClInclude Include="seminar4\flatbuffers\data1_generated.h">
+      <Filter>seminar4\flatbuffers</Filter>
+    </ClInclude>
+    <ClInclude Include="seminar4\flatbuffers\simple_data_generated.h">
+      <Filter>seminar4\flatbuffers</Filter>
+    </ClInclude>
+    <ClInclude Include="seminar4\flatbuffers\GameMessage.hpp">
+      <Filter>seminar4\flatbuffers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="seminar4\flatbuffers\resources\data1.fbs">
+      <Filter>seminar4\flatbuffers\resources</Filter>
+    </None>
+    <None Include="seminar4\flatbuffers\resources\simple_data.fbs">
+      <Filter>seminar4\flatbuffers\resources</Filter>
+    </None>
   </ItemGroup>
 </Project>

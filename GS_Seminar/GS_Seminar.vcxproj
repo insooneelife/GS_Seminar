@@ -19,11 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="seminar4\MemoryBitStream.h" />
+    <ClCompile Include="seminar4\main.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="seminar4\MemoryStream\MemoryBitStream.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="seminar4\main.cpp" />
-    <ClCompile Include="seminar4\MemoryBitStream.cpp" />
+    <ClInclude Include="seminar4\flatbuffers\data1_generated.h" />
+    <ClInclude Include="seminar4\flatbuffers\flatbuffers\flatbuffers.h" />
+    <ClInclude Include="seminar4\flatbuffers\GameMessage.hpp" />
+    <ClInclude Include="seminar4\flatbuffers\simple_data_generated.h" />
+    <ClInclude Include="seminar4\MemoryStream\MemoryBitStream.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="seminar4\flatbuffers\resources\data1.fbs" />
+    <None Include="seminar4\flatbuffers\resources\simple_data.fbs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8E433FC7-13B6-43CE-9497-289F65DF7A45}</ProjectGuid>

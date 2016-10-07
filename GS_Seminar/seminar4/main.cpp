@@ -292,14 +292,14 @@ namespace _3_flatbuffers1
 	{
 		// buffer의 내용은 네트워크로부터 recv 되었다고 생각해 볼 수도 있다.
 
-		// Getpos 함수를 이용하여 buffer의 내용을 구조체의 형태로 변환한다.
-		auto pos = MyGame::Getpos(buffer);
-
 		// data가 손상되지 않았는지 검증한다.
 		if (MyGame::VerifyposBuffer(flatbuffers::Verifier(buffer, length)))
 			cout << "good!" << endl;
 		else
 			cout << "bad!" << endl;
+
+		// Getpos 함수를 이용하여 buffer의 내용을 구조체의 형태로 변환한다.(역직렬화)
+		auto pos = MyGame::Getpos(buffer);
 
 		cout << pos->x() << ", " << pos->y() << ", " << pos->z() << endl;
 	}
@@ -368,6 +368,7 @@ namespace _4_flatbuffers2
 		else
 			cout << "bad!" << endl;
 
+		// buffer의 직렬화된 data를 역직렬화 한다.
 		auto monster = MyGame::GetMonster(buffer);
 
 		string name = monster->name()->c_str();
@@ -405,8 +406,129 @@ namespace _4_flatbuffers2
 // 즉 보낼 때 어떤 타입의 데이터인지와,
 // 길이가 얼마인지에 대한 정보를 packet의 header부분에 추가해서 data를 전송해 주어야 한다.
 // 그 과정을 편리하게 수행하기 위해 flatbuffer를 한번 wrapping한 GameMessage라는 class를 만든다.
+
+#include "flatbuffers\GameMessage.hpp"
+
 namespace _5_GameMessage
 {
+	enum Types
+	{
+		kMonster,
+		kPos
+	};
+
+	// pos에 대한 packet 생성함수
+	// Monster에 대해서도 만들 수 있을 것이다.
+	GameMessage createPosPacket(float x, float y, float z)
+	{
+		flatbuffers::FlatBufferBuilder builder;
+		auto pos_data = MyGame::Createpos(builder, x, y, z);
+		builder.Finish(pos_data);
+
+		// Type정보와 Size정보를 pakcet header에 기록하기 위해 GameMessage로 감싼다.
+		GameMessage packet(builder, Types::kPos);
+		return packet;
+
+		// GameMessage의 body에는 flatbuffers로 직렬화된 data가 저장된다.
+		// packet.getBody();
+
+		// flatbuffers data의 길이
+		// packet.getBodyLength();
+
+		// GameMessage의 data에는 flatbuffers data + header data가 저장된다.
+		// header data에는 길이 정보와, 타입 정보가 포함된다.
+		// packet.getData();
+
+		// flatbuffers data + header data의 길이
+		// packet.getLength();
+
+		// 타입이 무엇인지만 확인하는 함수
+		// packet.getType();
+	}
+
+	void handlePosPacket(const uint8_t* body, size_t body_length)
+	{
+		// 검증
+		if (MyGame::VerifyposBuffer(flatbuffers::Verifier(body, body_length)))
+			cout << "good!" << endl;
+		else
+			cout << "bad!" << endl;
+
+		// 역직렬화
+		auto pos = MyGame::Getpos(body);
+
+		// 출력
+		cout << pos->x() << ", " << pos->y() << ", " << pos->z() << endl;
+	}
+
+	void handleMonsterPacket(const uint8_t* body, size_t body_length)
+	{
+		// 검증
+		if (MyGame::VerifyMonsterBuffer(flatbuffers::Verifier(body, body_length)))
+			cout << "good!" << endl;
+		else
+			cout << "bad!" << endl;
+
+		// 역직렬화
+		auto monster = MyGame::GetMonster(body);
+
+		// 출력
+		string name = monster->name()->c_str();
+		float x = monster->x();
+		float y = monster->y();
+		float z = monster->z();
+		short mana = monster->mana();
+		short hp = monster->hp();
+		auto weapons = monster->weapons();
+
+		for (auto w = weapons->begin(); w != weapons->end(); ++w)
+		{
+			std::cout << w->name()->c_str() << " " << w->damage() << endl;
+		}
+		std::cout << name << endl;
+		std::cout << "pos : " << x << " " << y << " " << z << endl;
+		std::cout << "hp/mp : " << hp << " " << mana << endl;
+	}
+	
+
+	void example()
+	{
+		float x = 1441.5f;
+		float y = -554.7f;
+		float z = 994.88f;
+
+		// pos에 대한 packet을 만든다.
+		GameMessage& send_packet = createPosPacket(x, y, z);
+
+		// 네트워크를 통해 getData()의 data를 send할 수 있을 것이다.
+		// buffer를 통해 실제로 send가 된다고 가정하자.
+		uint8_t buffer[4000] = { 0 };
+		size_t length = 0;
+
+		memcpy(buffer, send_packet.getData(), send_packet.getLength());
+		length = send_packet.getLength();
+
+		// ..
+		// 네트워크를 통해 다른 컴퓨터에서 데이터를 recv한다고 가정한다.
+		// 데이터는 recv를 통해 buffer에 저장된다고 가정한다.
+		// ..
+
+		
+		// 현재 buffer에는 어떤 데이터가 있는지 알 수 없지만,
+		// buffer와 length로 GameMessage를 생성시킨다면,
+		GameMessage recv_packet(buffer, length);
+
+		// Type을 읽어올 수 있다.
+		if (recv_packet.getType() == Types::kPos)
+		{
+			// Type에 맞게 body에 있는 flatbuffer로 직렬화 된 data를 처리해준다.
+			handlePosPacket(recv_packet.getBody(), recv_packet.getBodyLength());
+		}
+		else if (recv_packet.getType() == Types::kMonster)
+		{
+			handleMonsterPacket(recv_packet.getBody(), recv_packet.getBodyLength());
+		}
+	}
 }
 
 int main()
@@ -414,7 +536,8 @@ int main()
 	//_1_Serialize::example();
 	//_2_MemoryStream::example();
 	//_3_flatbuffers1::example();
-	_4_flatbuffers2::example();
+	//_4_flatbuffers2::example();
+	_5_GameMessage::example();
 	return 0;
 }
 

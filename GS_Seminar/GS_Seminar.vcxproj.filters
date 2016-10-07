@@ -50,4 +50,9 @@
       <Filter>seminar4\flatbuffers\resources</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="seminar4\과제.txt">
+      <Filter>seminar4</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

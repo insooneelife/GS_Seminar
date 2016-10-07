@@ -35,6 +35,9 @@
     <None Include="seminar4\flatbuffers\resources\data1.fbs" />
     <None Include="seminar4\flatbuffers\resources\simple_data.fbs" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="seminar4\과제.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8E433FC7-13B6-43CE-9497-289F65DF7A45}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

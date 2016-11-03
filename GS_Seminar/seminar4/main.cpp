@@ -165,6 +165,9 @@ namespace _1_Serialize
 		writeBits(buffer, &c, sizeof(c) * 8, write_head);
 		printBufferState(buffer, 16, write_head);
 
+		// client -> server
+
+		// server recv
 
 		int ra;
 		readBits(buffer, &ra, sizeof(ra) * 8, read_head);
@@ -217,7 +220,6 @@ namespace _2_MemoryStream
 		std::cout << "read c : " << ic << std::endl;
 	}
 }
-
 
 // 직렬화를 위한 library를 직접 만들어 보았다.
 // 하지만 MemoryStream은 여전히 해결하지 못한 여러가지 문제점들을 갖고 있다.
@@ -272,7 +274,8 @@ namespace _2_MemoryStream
 
 // 사용법을 알아보자
 // 먼저 생성된 코드를 포함시킨다.
-#include "flatbuffers\simple_data_generated.h"
+
+#include "flatbuffers\test_generated.h"
 
 // 생성된 코드에 대한 idl은 resource파일에 simple_data.fbs에 있다.
 
@@ -284,6 +287,22 @@ namespace _3_flatbuffers1
 	// flatbuffer library를 이용한 data 직렬화 예제
 	void write(unsigned char* buffer, size_t& length)
 	{
+		flatbuffers::FlatBufferBuilder builder;
+
+		float x = 324.0f;
+		float y = 124.0f;
+		float z = -91.0f;
+
+		auto fdata = test::Createposition(builder, x, y, z);
+		builder.Finish(fdata);
+
+		// 직렬화된 data
+		memcpy(buffer, builder.GetBufferPointer() , builder.GetSize());
+
+		// 직렬화된 data size
+		length = builder.GetSize();
+
+		/*
 		// flatbuffer 직렬화 builder를 만든다.
 		flatbuffers::FlatBufferBuilder builder;
 
@@ -291,7 +310,6 @@ namespace _3_flatbuffers1
 		float x = 1441.5f;
 		float y = -554.7f;
 		float z = 994.88f;
-
 		// pos 직렬화를 위한 중간 data 생성
 		auto pos_data = MyGame::Createpos(builder, x, y, z);
 
@@ -305,11 +323,26 @@ namespace _3_flatbuffers1
 		length = builder.GetSize();
 
 		// 네트워크로 send를 한다면 위 buffer를 send하면 된다.
+		*/
 	}
 
 	// flatbuffers library를 이용한 data 역직렬화 예제
 	void read(unsigned char* buffer, size_t length)
 	{
+		// 검증
+		if (test::VerifypositionBuffer(flatbuffers::Verifier(buffer, length)))
+			cout << "good!" << endl;
+		else
+			cout << "bad!" << endl;
+
+		// 역직렬화
+		auto pos = test::Getposition(buffer);
+
+		std::cout
+			<< pos->x() << " "
+			<< pos->y() << " "
+			<< pos->z() << std::endl;
+		/*
 		// buffer의 내용은 네트워크로부터 recv 되었다고 생각해 볼 수도 있다.
 
 		// data가 손상되지 않았는지 검증한다.
@@ -322,14 +355,22 @@ namespace _3_flatbuffers1
 		auto pos = MyGame::Getpos(buffer);
 
 		cout << pos->x() << ", " << pos->y() << ", " << pos->z() << endl;
+		*/
 	}
 
 	void example()
 	{
 		std::cout << "_3_flatbuffers1" << std::endl << std::endl;
-		uint8_t buffer[1024] = { 0 };
+		unsigned char buffer[1024] = { 0 };
 		size_t length = 0;
+
+		//client
 		write(buffer, length);
+
+		// send
+		// network 통신
+		// recv
+
 		read(buffer, length);
 	}
 }
@@ -352,6 +393,7 @@ namespace _4_flatbuffers2
 		// string의 경우에는 직렬화 가능한 flatbuffer string을 변환과정이 필요하다.
 		auto encode_weapon1 = builder.CreateString(weapon1);
 		auto encode_weapon2 = builder.CreateString(weapon2);
+
 		auto sword = MyGame::CreateWeapon(builder, encode_weapon1, damage);
 		auto axe = MyGame::CreateWeapon(builder, encode_weapon2, damage);
 
@@ -412,15 +454,20 @@ namespace _4_flatbuffers2
 	void example()
 	{
 		std::cout << "_4_flatbuffers2" << std::endl << std::endl;
+
 		uint8_t buffer[1024] = { 0 };
 		size_t length = 0;
+
 		write(buffer, length);
+
+		// 통신~
+
 		read(buffer, length);
 
-		std::cout << std::endl << "2진수" << std::endl;
-		printBufferToBinary(buffer, length);
-		std::cout << std::endl << "16진수" << std::endl;
-		printBufferToHex(buffer, length);
+		//std::cout << std::endl << "2진수" << std::endl;
+		//printBufferToBinary(buffer, length);
+		//std::cout << std::endl << "16진수" << std::endl;
+		//printBufferToHex(buffer, length);
 	}
 }
 
@@ -435,6 +482,7 @@ namespace _4_flatbuffers2
 // 그 과정을 편리하게 수행하기 위해 flatbuffer를 한번 wrapping한 GameMessage라는 class를 만든다.
 
 #include "flatbuffers\GamePacket.hpp"
+#include "flatbuffers\simple_data_generated.h"
 
 namespace _5_GamePacket
 {
@@ -448,6 +496,7 @@ namespace _5_GamePacket
 	// Monster에 대해서도 만들 수 있을 것이다.
 	GamePacket createPosPacket(float x, float y, float z)
 	{
+		// 직렬화
 		flatbuffers::FlatBufferBuilder builder;
 		auto pos_data = MyGame::Createpos(builder, x, y, z);
 		builder.Finish(pos_data);
@@ -521,6 +570,8 @@ namespace _5_GamePacket
 	void example()
 	{
 		std::cout << "_5_GameMessage" << std::endl << std::endl;
+
+		// Server
 		float x = 1441.5f;
 		float y = -554.7f;
 		float z = 994.88f;
@@ -536,10 +587,13 @@ namespace _5_GamePacket
 		memcpy(buffer, send_packet.getData(), send_packet.getLength());
 		length = send_packet.getLength();
 
+
+		// send(send_packet.getData(), send_packet.getLength())
 		// ..
 		// 네트워크를 통해 다른 컴퓨터에서 데이터를 recv한다고 가정한다.
 		// 데이터는 recv를 통해 buffer에 저장된다고 가정한다.
 		// ..
+		// recv(buffer)
 
 		
 		// 현재 buffer에는 어떤 데이터가 있는지 알 수 없지만,
@@ -559,13 +613,25 @@ namespace _5_GamePacket
 	}
 }
 
+
+
+namespace practice
+{
+	void example()
+	{
+
+	}
+}
+
+
+
 int main()
 {
 	//_1_Serialize::example();
 	//_2_MemoryStream::example();
 	//_3_flatbuffers1::example();
-	_4_flatbuffers2::example();
-	//_5_GameMessage::example();
+	//_4_flatbuffers2::example();
+	_5_GamePacket::example();
 	return 0;
 }
 

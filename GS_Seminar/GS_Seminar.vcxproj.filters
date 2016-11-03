@@ -41,6 +41,9 @@
     <ClInclude Include="seminar4\flatbuffers\GamePacket.hpp">
       <Filter>seminar4\flatbuffers</Filter>
     </ClInclude>
+    <ClInclude Include="seminar4\flatbuffers\test_generated.h">
+      <Filter>seminar4\flatbuffers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="seminar4\flatbuffers\resources\data1.fbs">

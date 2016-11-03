@@ -27,7 +27,7 @@
   <ItemGroup>
     <ClInclude Include="seminar4\flatbuffers\data1_generated.h" />
     <ClInclude Include="seminar4\flatbuffers\flatbuffers\flatbuffers.h" />
-    <ClInclude Include="seminar4\flatbuffers\GameMessage.hpp" />
+    <ClInclude Include="seminar4\flatbuffers\GamePacket.hpp" />
     <ClInclude Include="seminar4\flatbuffers\simple_data_generated.h" />
     <ClInclude Include="seminar4\MemoryStream\MemoryBitStream.h" />
   </ItemGroup>

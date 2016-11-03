@@ -38,7 +38,7 @@
     <ClInclude Include="seminar4\flatbuffers\simple_data_generated.h">
       <Filter>seminar4\flatbuffers</Filter>
     </ClInclude>
-    <ClInclude Include="seminar4\flatbuffers\GameMessage.hpp">
+    <ClInclude Include="seminar4\flatbuffers\GamePacket.hpp">
       <Filter>seminar4\flatbuffers</Filter>
     </ClInclude>
   </ItemGroup>

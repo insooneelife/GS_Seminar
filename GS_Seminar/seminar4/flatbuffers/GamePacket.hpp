@@ -10,7 +10,7 @@
 
 #include "flatbuffers\flatbuffers.h"
 
-class GameMessage
+class GamePacket
 {
 public:
 	// header의 허용 길이
@@ -27,13 +27,13 @@ public:
 	// body는 flatbuffer와 호환 가능한 buffer를 사용
 	enum { MAX_BODY_LENGTH = 2048 };
 
-	GameMessage()
+	GamePacket()
 		:
 		_body_length(0),
 		_type(0)
 	{}
 
-	explicit GameMessage(int type)
+	explicit GamePacket(int type)
 	{
 		setBodyLength(0);
 		setType(type);
@@ -42,7 +42,7 @@ public:
 
 	// 이전에 GameMessage를 통해 만들어진 data와 (header data + flatbuffer data)
 	// 그 data의 길이를 이용한 생성자.
-	GameMessage(const uint8_t* data_with_header, size_t length)
+	GamePacket(const unsigned char* data_with_header, unsigned int length)
 	{
 		std::memcpy(getData(), data_with_header, length);
 		decodeHeader();
@@ -51,7 +51,7 @@ public:
 	// flatbuffers를 이용한 GameMessage 생성자
 	// data가 직렬화 된 후의 builder와,
 	// 이 builder가 어떤 data를 담고 있는지에 대한 type 인자를 넣어준다.
-	GameMessage(const flatbuffers::FlatBufferBuilder& builder, int type)
+	GamePacket(const flatbuffers::FlatBufferBuilder& builder, int type)
 	{
 		setBodyLength(builder.GetSize());
 		setType(type);
@@ -60,49 +60,49 @@ public:
 		encodeHeader();	
 	}
 
-	const uint8_t* getData() const
+	const unsigned char* getData() const
 	{
 		return _data;
 	}
 
-	uint8_t* getData()
+	unsigned char* getData()
 	{
 		return _data;
 	}
 
-	size_t getLength() const
+	unsigned int getLength() const
 	{
 		return HEADER_LENGTH + _body_length;
 	}
 
-	const uint8_t* getBody() const
+	const unsigned char* getBody() const
 	{
 		return _data + HEADER_LENGTH;
 	}
 
-	uint8_t* getBody()
+	unsigned char* getBody()
 	{
 		return _data + HEADER_LENGTH;
 	}
 
-	size_t getBodyLength() const
+	unsigned int getBodyLength() const
 	{
 		return _body_length;
 	}
 
-	size_t getType() const
+	unsigned int getType() const
 	{
 		return _type;
 	}
 
-	void setBodyLength(size_t new_length)
+	void setBodyLength(unsigned int new_length)
 	{
 		_body_length = new_length;
 		if (_body_length > MAX_BODY_LENGTH)
-			_body_length = MAX_BODY_LENGTH;
+			std::cout << "Body length is too big!" << std::endl;
 	}
 
-	void setType(size_t new_type)
+	void setType(unsigned int new_type)
 	{
 		_type = new_type;
 	}
@@ -126,7 +126,7 @@ public:
 
 		if (_body_length > MAX_BODY_LENGTH)
 		{
-			std::cout << "decide error" << std::endl;
+			std::cout << "Body length is too big!" << std::endl;
 			_body_length = 0;
 			return false;
 		}
@@ -147,11 +147,11 @@ public:
 
 private:
 	// 데이터의 몸체를 저장하는 변수
-	uint8_t _data[HEADER_LENGTH + MAX_BODY_LENGTH];
+	unsigned char _data[HEADER_LENGTH + MAX_BODY_LENGTH];
 
 	// 데이터의 길이를 저장하는 변수
-	size_t _body_length;
+	unsigned int _body_length;
 
 	// 데이터의 타입을 저장하는 변수
-	size_t _type;
+	unsigned int _type;
 };

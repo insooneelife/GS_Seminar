@@ -35,6 +35,9 @@
     <ClInclude Include="assigment4\Socket\TCPSocket.h" />
     <ClInclude Include="assigment4\Socket\UDPSocket.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="assigment4\과제.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8E433FC7-13B6-43CE-9497-289F65DF7A45}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

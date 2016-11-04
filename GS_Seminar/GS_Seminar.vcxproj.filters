@@ -54,4 +54,9 @@
       <Filter>assignment4\Socket</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="assigment4\과제.txt">
+      <Filter>assignment4</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

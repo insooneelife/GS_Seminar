@@ -1,61 +1,57 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="seminar4">
-      <UniqueIdentifier>{78ea1c8f-eb36-421a-bf26-25b0bf47639b}</UniqueIdentifier>
+    <Filter Include="assignment4">
+      <UniqueIdentifier>{475020bd-babc-4957-914a-bdc48e27cf40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="seminar4\MemoryStream">
-      <UniqueIdentifier>{65064e77-6f15-48a5-a0ed-b72ba1990774}</UniqueIdentifier>
+    <Filter Include="assignment4\Socket">
+      <UniqueIdentifier>{4374db98-ef0a-42a4-ad55-8e3ed58caada}</UniqueIdentifier>
     </Filter>
-    <Filter Include="seminar4\flatbuffers">
-      <UniqueIdentifier>{20b2be74-33a5-4dae-ab73-18a451ac4c99}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="seminar4\flatbuffers\flatbuffers">
-      <UniqueIdentifier>{a4665076-6232-42b1-a2d2-3a854ab8822e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="seminar4\flatbuffers\resources">
-      <UniqueIdentifier>{fc4d085d-e3ce-4ecc-a229-9336488fd9dc}</UniqueIdentifier>
+    <Filter Include="assignment4\flatbuffers">
+      <UniqueIdentifier>{0583a9ce-12e3-4cd9-b447-710a95be60f6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="seminar4\main.cpp">
-      <Filter>seminar4</Filter>
+    <ClCompile Include="assigment4\main.cpp">
+      <Filter>assignment4</Filter>
     </ClCompile>
-    <ClCompile Include="seminar4\MemoryStream\MemoryBitStream.cpp">
-      <Filter>seminar4\MemoryStream</Filter>
+    <ClCompile Include="assigment4\Socket\SocketAddress.cpp">
+      <Filter>assignment4\Socket</Filter>
+    </ClCompile>
+    <ClCompile Include="assigment4\Socket\SocketUtil.cpp">
+      <Filter>assignment4\Socket</Filter>
+    </ClCompile>
+    <ClCompile Include="assigment4\Socket\TCPSocket.cpp">
+      <Filter>assignment4\Socket</Filter>
+    </ClCompile>
+    <ClCompile Include="assigment4\Socket\UDPSocket.cpp">
+      <Filter>assignment4\Socket</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="seminar4\MemoryStream\MemoryBitStream.h">
-      <Filter>seminar4\MemoryStream</Filter>
+    <ClInclude Include="assigment4\flatbuffers\data1_generated.h">
+      <Filter>assignment4\flatbuffers</Filter>
     </ClInclude>
-    <ClInclude Include="seminar4\flatbuffers\flatbuffers\flatbuffers.h">
-      <Filter>seminar4\flatbuffers\flatbuffers</Filter>
+    <ClInclude Include="assigment4\flatbuffers\GamePacket.hpp">
+      <Filter>assignment4\flatbuffers</Filter>
     </ClInclude>
-    <ClInclude Include="seminar4\flatbuffers\data1_generated.h">
-      <Filter>seminar4\flatbuffers</Filter>
+    <ClInclude Include="assigment4\flatbuffers\simple_data_generated.h">
+      <Filter>assignment4\flatbuffers</Filter>
     </ClInclude>
-    <ClInclude Include="seminar4\flatbuffers\simple_data_generated.h">
-      <Filter>seminar4\flatbuffers</Filter>
+    <ClInclude Include="assigment4\flatbuffers\test_generated.h">
+      <Filter>assignment4\flatbuffers</Filter>
     </ClInclude>
-    <ClInclude Include="seminar4\flatbuffers\GamePacket.hpp">
-      <Filter>seminar4\flatbuffers</Filter>
+    <ClInclude Include="assigment4\Socket\SocketAddress.h">
+      <Filter>assignment4\Socket</Filter>
     </ClInclude>
-    <ClInclude Include="seminar4\flatbuffers\test_generated.h">
-      <Filter>seminar4\flatbuffers</Filter>
+    <ClInclude Include="assigment4\Socket\SocketUtil.h">
+      <Filter>assignment4\Socket</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="seminar4\flatbuffers\resources\data1.fbs">
-      <Filter>seminar4\flatbuffers\resources</Filter>
-    </None>
-    <None Include="seminar4\flatbuffers\resources\simple_data.fbs">
-      <Filter>seminar4\flatbuffers\resources</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="seminar4\과제.txt">
-      <Filter>seminar4</Filter>
-    </Text>
+    <ClInclude Include="assigment4\Socket\TCPSocket.h">
+      <Filter>assignment4\Socket</Filter>
+    </ClInclude>
+    <ClInclude Include="assigment4\Socket\UDPSocket.h">
+      <Filter>assignment4\Socket</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

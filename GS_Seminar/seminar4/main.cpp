@@ -631,7 +631,7 @@ int main()
 	//_2_MemoryStream::example();
 	//_3_flatbuffers1::example();
 	//_4_flatbuffers2::example();
-	_5_GamePacket::example();
+	//_5_GamePacket::example();
 	return 0;
 }
 

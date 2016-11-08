@@ -27,6 +27,8 @@ public:
 	// body는 flatbuffer와 호환 가능한 buffer를 사용
 	enum { MAX_BODY_LENGTH = 2048 };
 
+	enum { MAX_DATA_LENGTH = HEADER_LENGTH + MAX_BODY_LENGTH };
+
 	GamePacket()
 		:
 		_body_length(0),

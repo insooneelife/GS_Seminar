@@ -30,10 +30,10 @@ OkayPacket
 	id:int
 }
 
-Chat message에 포함되는 정보로는 입력된 message와 message를 보낸 id정보가 있을 것이다.
+Chat message에 포함되는 정보로는 입력된 message와 message를 보낸 name정보가 있을 것이다.
 MessagePacket
 {
-	id:int
+	name:string
 	message:string
 }
 

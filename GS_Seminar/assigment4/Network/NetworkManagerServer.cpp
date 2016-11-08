@@ -1,19 +1,11 @@
 #include <iostream>
 #include <sstream>
+#include <cassert>
 #include "NetworkManagerServer.h"
+#include "PacketFactory.h"
 using namespace std;
 
-namespace
-{
-	// Server의 client map에 새 client의 id와 주소 정보를 추가한다.
-	const string kLoginPacket = "<Login>";
-
-	// 접속이 성공적일 경우, client에게 아래 문자열을 보낸다.
-	const string kOkayPacket = "<Okay>";
-}
-
 std::unique_ptr<NetworkManagerServer> NetworkManagerServer::instance = nullptr;
-
 
 void NetworkManagerServer::staticInit(uint16_t port)
 {
@@ -37,73 +29,106 @@ bool NetworkManagerServer::init()
 
 void NetworkManagerServer::update()
 {
-	// Client의 주소를 담을 임시 공간
-	SocketAddress client_address;
+	recv();
 
-	// Client로부터 받은 데이터를 담을 버퍼
-	char buffer[1024] = { 0 };
+	// process other logics ..
+}
 
-	// Non-blocking mode의 socket에서는 recv함수의 return값을 보고
-	// 현재 어떤 상황인지 알 수 있다.
-	int read_bytes = _socket->receiveFrom(buffer, 1024, client_address);
 
-	// 읽을 것이 없었고 비동기 모드에 맞게 receiveFrom에서 block되지 않고 넘어간다.
+void NetworkManagerServer::recv()
+{
+	SocketAddress address;
+	GamePacket packet;
+	int read_bytes = _socket->receiveFrom(packet.getData(), GamePacket::MAX_DATA_LENGTH, address);
+
+	// Nothing to read
 	if (read_bytes == 0)
 	{
-		// nothing to read
+		
 	}
-	// Client에서 socket이 닫혔음을 알리는 값이다.
-	// 이 값이 return 값으로 반환되기 위해서는,
-	// server 쪽에서 sendTo 함수를 통해 이 client에게 무언가를 보내야 한다.
+	// Disconnected
 	else if (read_bytes == -WSAECONNRESET)
 	{
-		cout << "연결이 끊긴 client : " << client_address.toString() << endl;
-
-		auto iter = addressToID.find(client_address);
-		int id = iter->second;
-		clients.erase(id);
-		addressToID.erase(client_address);
+		removeClient(address);
 	}
-	// 읽을 data가 있을 경우 return 값으로 data의 크기가 반환된다.
+	// Something to read
 	else if (read_bytes > 0)
 	{
-		cout << "[server received] address : "
-			<< client_address.toString()
-			<< "   data : "
-			<< buffer << endl;
-
-		// 받은 packet에 대한 처리
-		string data = buffer;
-		if (data == kLoginPacket)
-		{
-			// "<Login>" 형태의 문자열을 받을 경우, 이 client를 clients hashmap에 추가한다.
-			int client_num = clients.size();
-			clients.emplace(client_num + 1, client_address);
-			addressToID.emplace(client_address, client_num + 1);
-
-			// 성공적으로 접속되었음을 client에게 알린다.
-			_socket->sendTo(kOkayPacket.c_str(), kOkayPacket.size(), client_address);
-		}
-		else
-		{
-			auto iter = addressToID.find(client_address);
-			int id = iter->second;
-
-			stringstream ss;
-			ss << id;
-			data = ss.str() + " : " + data;
-
-			// 모든 client에게 받은 packet(data)를 전달한다.
-			for (auto c : clients)
-			{
-				_socket->sendTo(data.c_str(), data.size(), c.second);
-			}
-		}
+		packet.decodeHeader();
+		handlePacketByType(packet, address);
 	}
 	else
 	{
 		// uhoh, error? exit or just keep going?
 	}
+}
 
-	// process other logics ..
+
+void NetworkManagerServer::send(GamePacket& packet, const SocketAddress& address)
+{
+	_socket->sendTo(packet.getData(), packet.getLength(), address);
+}
+
+
+void NetworkManagerServer::handlePacketByType(const GamePacket& packet, const SocketAddress& from)
+{
+	if (packet.getType() == PacketFactory::kLogin)
+	{
+		cout << "packet : [LoginPacket]  from : " << from.toString() << endl;
+		handleLoginPacket(from, packet.getBody(), packet.getBodyLength());
+		
+	}
+	else if (packet.getType() == PacketFactory::kMessage)
+	{
+		cout << "packet : [MessagePacket]  from : " << from.toString() << endl;
+		handleMessagePacket(from, packet.getBody(), packet.getBodyLength());
+	}
+	else
+	{
+		cout << "can't handle this packet : " << packet.getType() << std::endl;
+	}
+	cout << endl;
+}
+
+void NetworkManagerServer::handleLoginPacket(
+	const SocketAddress& from,
+	const uint8_t* buffer, 
+	size_t length)
+{
+	// Verify
+	assert(Packets::VerifyLoginPacketBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [LoginPacket]!");
+
+	// Process packet logic
+	int client_id = _clients.size() + 1;
+	auto data = Packets::GetLoginPacket(buffer);
+	std::string name = data->name()->c_str();
+
+	insertClient(client_id, from, name);
+	
+	// Response
+	GamePacket& packet = PacketFactory::createOkayPacket(client_id);
+	send(packet, from);
+}
+
+void NetworkManagerServer::handleMessagePacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
+{
+	// Verify
+	assert(Packets::VerifyMessagePacketBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [MessagePacket]!");
+
+	// Process packet logic
+	auto data = Packets::GetMessagePacket(buffer);
+	string name = data->name()->c_str();
+	string message = data->message()->c_str();
+
+	// Response to all
+	GamePacket& packet = PacketFactory::createMessagePacket(name, message);
+	for (auto c : _clients)
+	{
+		send(packet, c.second);
+	}
 }

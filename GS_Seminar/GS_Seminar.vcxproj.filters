@@ -39,18 +39,12 @@
     <ClCompile Include="assigment4\not used.cpp">
       <Filter>assignment4</Filter>
     </ClCompile>
+    <ClCompile Include="assigment4\Network\PacketFactory.cpp">
+      <Filter>assignment4\Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="assigment4\flatbuffers\data1_generated.h">
-      <Filter>assignment4\flatbuffers</Filter>
-    </ClInclude>
     <ClInclude Include="assigment4\flatbuffers\GamePacket.hpp">
-      <Filter>assignment4\flatbuffers</Filter>
-    </ClInclude>
-    <ClInclude Include="assigment4\flatbuffers\simple_data_generated.h">
-      <Filter>assignment4\flatbuffers</Filter>
-    </ClInclude>
-    <ClInclude Include="assigment4\flatbuffers\test_generated.h">
       <Filter>assignment4\flatbuffers</Filter>
     </ClInclude>
     <ClInclude Include="assigment4\Socket\SocketAddress.h">
@@ -70,6 +64,18 @@
     </ClInclude>
     <ClInclude Include="assigment4\Network\NetworkManagerServer.h">
       <Filter>assignment4\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="assigment4\Network\PacketFactory.h">
+      <Filter>assignment4\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="assigment4\flatbuffers\Packets\loginpacket_generated.h">
+      <Filter>assignment4\flatbuffers</Filter>
+    </ClInclude>
+    <ClInclude Include="assigment4\flatbuffers\Packets\MessagePacket_generated.h">
+      <Filter>assignment4\flatbuffers</Filter>
+    </ClInclude>
+    <ClInclude Include="assigment4\flatbuffers\Packets\OkayPacket_generated.h">
+      <Filter>assignment4\flatbuffers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

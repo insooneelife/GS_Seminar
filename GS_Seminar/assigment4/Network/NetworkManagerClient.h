@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include "PacketFactory.h"
 #include "../Socket/UDPSocket.h"
 #include "../Socket/SocketUtil.h"
 #include "../Socket/SocketAddress.h"
@@ -12,14 +13,22 @@ class NetworkManagerClient
 {
 public:
 	static std::unique_ptr<NetworkManagerClient> instance;
-	static void staticInit(const std::string& server_addr);
+	static void staticInit(const std::string& server_addr, const std::string& client_name);
 
-	NetworkManagerClient();
+	NetworkManagerClient(const std::string& client_name);
 	~NetworkManagerClient()
 	{}
 
 	bool init(const std::string& server_addr);
 	void update();
+
+	void recv();
+	void send(GamePacket& packet, const SocketAddress& address);
+
+	void handlePacketByType(const GamePacket& packet, const SocketAddress& from);
+
+	void handleOkayPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
+	void handleMessagePacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 
 private:
 
@@ -27,8 +36,8 @@ private:
 	std::unique_ptr<SocketAddress> _address;
 	std::unique_ptr<SocketAddress> _server_address;
 
-	// Keyboard 입력을 담을 buffer
-	char inputs[128] = { 0 };
-	char inputCur = 0;
+	int _id;
+	std::string _client_name;
+	std::string _input_message;
 };
 

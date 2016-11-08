@@ -2,6 +2,7 @@
 
 namespace MyGame;
 
+
 table Monster 
 {
   x:float;

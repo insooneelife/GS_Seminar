@@ -1,31 +1,27 @@
 #include <iostream>
 #include <sstream>
-#include "NetworkManagerClient.h"
+#include <cassert>
 #include <conio.h>
+#include "NetworkManagerClient.h"
+#include "PacketFactory.h"
+
 using namespace std;
-
-namespace
-{
-	// Server의 client map에 새 client의 id와 주소 정보를 추가한다.
-	const string kLoginPacket = "<Login>";
-
-	// 접속이 성공적일 경우, client에게 아래 문자열을 보낸다.
-	const string kOkayPacket = "<Okay>";
-}
 
 std::unique_ptr<NetworkManagerClient> NetworkManagerClient::instance = nullptr;
 
-
-void NetworkManagerClient::staticInit(const string& server_addr)
+void NetworkManagerClient::staticInit(const string& server_addr, const std::string& client_name)
 {
-	instance.reset(new NetworkManagerClient());
+	instance.reset(new NetworkManagerClient(client_name));
 	instance->init(server_addr);
 }
 
-NetworkManagerClient::NetworkManagerClient()
+NetworkManagerClient::NetworkManagerClient(const std::string& client_name)
 	:
 	_socket(UDPSocket::create(SocketUtil::AddressFamily::INET)),
-	_address(new SocketAddress())
+	_address(new SocketAddress()),
+	_id(0),
+	_client_name(client_name),
+	_input_message("")
 {}
 
 
@@ -37,51 +33,117 @@ bool NetworkManagerClient::init(const string& server_addr)
 	// Server의 주소를 생성한다.
 	_server_address.reset(SocketAddress::createFromString(server_addr));
 
-
 	// Server에 로그인 요청을 한다.
-	_socket->sendTo(kLoginPacket.c_str(), kLoginPacket.size(), *_server_address);
+	GamePacket& packet = PacketFactory::createLoginPacket(_client_name);
+	send(packet, *_server_address);
 
-	// Socket을 non-blocking mode로 바꾼다.
-	_socket->setNoneBlockingMode(true);
 	return true;
 }
 
 
 void NetworkManagerClient::update()
 {
-	// Enter가 입력될 때까지 문자를 입력받는다.
-	// cin의 경우는 blocking io이기 때문에 사용하지 못한다.
 	if (_kbhit())
 	{
 		char ch = _getch();
-		inputs[inputCur++] = ch;
 		cout << ch;
 
 		// Enter 입력 시
 		if (ch == 13)
 		{
-			inputs[inputCur] = 0;
-			_socket->sendTo(inputs, inputCur, *_server_address);
-			inputCur = 0;
+			GamePacket& packet = PacketFactory::createMessagePacket(_client_name, _input_message);
+			send(packet, *_server_address);
+
+			_input_message = "";
+		}
+		else
+		{
+			_input_message += ch;
 		}
 	}
 
-	// Server로부터 데이터를 받는다.
-	SocketAddress temp;
-	char buffer[1024] = { 0 };
-	int read_bytes = _socket->receiveFrom(buffer, 1024, temp);
+	recv();
+}
 
+
+void NetworkManagerClient::recv()
+{
+	SocketAddress address;	
+	GamePacket packet;
+
+	int read_bytes = _socket->receiveFrom(packet.getData(), GamePacket::MAX_DATA_LENGTH, address);
+	
 	if (read_bytes == 0)
-	{
-	}
+	{}
+
 	else if (read_bytes == -WSAECONNRESET)
-	{
-	}
+	{}
+
 	else if (read_bytes > 0)
 	{
-		cout << buffer << endl;
+		packet.decodeHeader();
+		handlePacketByType(packet, address);
+	}
+	else
+	{}
+}
+
+
+void NetworkManagerClient::send(GamePacket& packet, const SocketAddress& address)
+{
+	_socket->sendTo(packet.getData(), packet.getLength(), address);
+}
+
+
+void NetworkManagerClient::handlePacketByType(const GamePacket& packet, const SocketAddress& from)
+{
+	if (packet.getType() == PacketFactory::kOkay)
+	{
+		cout << "packet : [OkayPacket]  from : " << from.toString() << endl;
+		handleOkayPacket(from, packet.getBody(), packet.getBodyLength());
+	}
+	else if (packet.getType() == PacketFactory::kMessage)
+	{
+		cout << "packet : [MessagePacket]  from : " << from.toString() << endl;
+		handleMessagePacket(from, packet.getBody(), packet.getBodyLength());
 	}
 	else
 	{
+		std::cout << "can't handle this packet : " << packet.getType() << std::endl;;
 	}
+	cout << endl;
 }
+
+void NetworkManagerClient::handleOkayPacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
+{
+	// Verify
+	assert(Packets::VerifyOkayPacketBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [OkayPacket]!");
+
+	// Process packet logic
+	_socket->setNoneBlockingMode(true);
+
+	auto data = Packets::GetOkayPacket(buffer);
+	_id = data->id();
+
+	cout << "my id : " << _id << endl;
+}
+
+void NetworkManagerClient::handleMessagePacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
+{
+	// Verify
+	assert(Packets::VerifyMessagePacketBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [MessagePacket]!");
+
+	// Process packet logic
+	auto data = Packets::GetMessagePacket(buffer);
+	
+	cout  << "name : " << data->name()->c_str() << "    message : " << data->message()->c_str() << endl;
+}
+

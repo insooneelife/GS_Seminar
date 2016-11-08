@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include "PacketFactory.h"
 #include "../Socket/UDPSocket.h"
 #include "../Socket/SocketUtil.h"
 #include "../Socket/SocketAddress.h"
@@ -20,12 +21,50 @@ public:
 	bool init();
 	void update();
 
+	void recv();
+	void send(GamePacket& packet, const SocketAddress& address);
+
+	void handlePacketByType(const GamePacket& packet, const SocketAddress& from);
+
+	void handleMessagePacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
+	void handleLoginPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
+
 private:
+
+	void insertClient(int id, const SocketAddress& address, const std::string& name)
+	{
+		_clients.emplace(id, address);
+		_address_to_id.emplace(address, id);
+		_id_to_name.emplace(id, name);
+		
+		std::cout << "connected client  address : " << address.toString()
+			<< "   id : " << id
+			<< "   name : " << name
+			<< std::endl;
+	}
+
+	void removeClient(const SocketAddress& address)
+	{
+		auto i = _address_to_id.find(address);
+		int id = i->second;
+		auto j = _id_to_name.find(id);
+		std::string name = j->second;
+
+		_clients.erase(id);
+		_address_to_id.erase(address);
+		_id_to_name.erase(id);
+
+		std::cout << "diconnected client  address : " << address.toString() 
+			<< "   id : " << id
+			<< "   name : "<< name
+			<< std::endl;
+	}
 
 	std::unique_ptr<UDPSocket> _socket;
 	std::unique_ptr<SocketAddress> _address;
 
-	std::unordered_map<int, SocketAddress> clients;
-	std::unordered_map<SocketAddress, int> addressToID;
+	std::unordered_map<int, SocketAddress> _clients;
+	std::unordered_map<SocketAddress, int> _address_to_id;
+	std::unordered_map<int, std::string> _id_to_name;
 };
 

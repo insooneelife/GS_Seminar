@@ -1,4 +1,6 @@
 #include "UDPSocket.h"
+#include "SocketAddress.h"
+#include "SocketUtil.h"
 #include <iostream>
 
 // UDPSocket class를 생성하기 위한 유일한 함수
@@ -100,9 +102,6 @@ int UDPSocket::receiveFrom(void* data, int max_length, SocketAddress& from_addr)
 UDPSocket::~UDPSocket()
 {
 #if _WIN32
-
-	std::cout << "~UDPSocket" << std::endl;
-
 	closesocket(_socket);
 #else
 	close( mSocket );

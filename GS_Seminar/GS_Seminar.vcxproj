@@ -20,6 +20,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assigment4\main.cpp" />
+    <ClCompile Include="assigment4\Network\NetworkManagerClient.cpp" />
+    <ClCompile Include="assigment4\Network\NetworkManagerServer.cpp" />
+    <ClCompile Include="assigment4\not used.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="assigment4\Socket\SocketAddress.cpp" />
     <ClCompile Include="assigment4\Socket\SocketUtil.cpp" />
     <ClCompile Include="assigment4\Socket\TCPSocket.cpp" />
@@ -30,6 +35,8 @@
     <ClInclude Include="assigment4\flatbuffers\GamePacket.hpp" />
     <ClInclude Include="assigment4\flatbuffers\simple_data_generated.h" />
     <ClInclude Include="assigment4\flatbuffers\test_generated.h" />
+    <ClInclude Include="assigment4\Network\NetworkManagerClient.h" />
+    <ClInclude Include="assigment4\Network\NetworkManagerServer.h" />
     <ClInclude Include="assigment4\Socket\SocketAddress.h" />
     <ClInclude Include="assigment4\Socket\SocketUtil.h" />
     <ClInclude Include="assigment4\Socket\TCPSocket.h" />

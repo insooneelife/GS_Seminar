@@ -3,26 +3,9 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <memory>
-#include "SocketAddress.h"
 #include "SocketUtil.h"
 
-// UDP 통신은 편지에 비유할 수 있다. 
-// packet -> 편지
-// socket -> 우체통
-// ip address -> 주소
-
-// UDP 통신은 다음과 같은 과정으로 이루어진다.
-//
-//	   Server								   Client
-//
-//	1. create socket(우체통)					1. create socket(우체통)
-//	2. bind(주소 등록)				 
-//	4. recvfrom(편지를 기다림)			<-		3. sendto(주소가 적힌 편지를 보냄)
-//	5. sendto(주소가 적힌 편지를 보냄)	->		6. recvfrom(편지를 기다림)
-//	7. close								7. close
-
-// UDP 통신을 편지에 비유하긴 했지만, 통신속도는 UDP가 더 빠르다.
-
+class SocketAddress;
 class UDPSocket
 {
 public:
@@ -46,11 +29,9 @@ public:
 	
 	int setNoneBlockingMode(bool flag);
 
-
 	SOCKET _socket;
 
 private:
 	UDPSocket(SOCKET socket) : _socket(socket) {}
-	//SOCKET _socket;
 };
 

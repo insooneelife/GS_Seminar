@@ -10,6 +10,9 @@
     <Filter Include="assignment4\flatbuffers">
       <UniqueIdentifier>{0583a9ce-12e3-4cd9-b447-710a95be60f6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="assignment4\Network">
+      <UniqueIdentifier>{0de53a71-a06b-4578-b3d9-8c05520681db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assigment4\main.cpp">
@@ -26,6 +29,15 @@
     </ClCompile>
     <ClCompile Include="assigment4\Socket\UDPSocket.cpp">
       <Filter>assignment4\Socket</Filter>
+    </ClCompile>
+    <ClCompile Include="assigment4\Network\NetworkManagerClient.cpp">
+      <Filter>assignment4\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="assigment4\Network\NetworkManagerServer.cpp">
+      <Filter>assignment4\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="assigment4\not used.cpp">
+      <Filter>assignment4</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -52,6 +64,12 @@
     </ClInclude>
     <ClInclude Include="assigment4\Socket\UDPSocket.h">
       <Filter>assignment4\Socket</Filter>
+    </ClInclude>
+    <ClInclude Include="assigment4\Network\NetworkManagerClient.h">
+      <Filter>assignment4\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="assigment4\Network\NetworkManagerServer.h">
+      <Filter>assignment4\Network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -101,6 +101,11 @@ void NetworkManagerClient::handlePacketByType(
 		cout << "packet : [NotifyDisconnectedPacket]  from : " << from.toString() << endl;
 		handleNotifyDisconnectedPacket(from, packet.getBody(), packet.getBodyLength());
 	}
+	else if (packet.getType() == PacketFactory::kEnterStarting)
+	{
+		cout << "packet : [EnterStarting]  from : " << from.toString() << endl;
+		handleEnterStartingPacket(from, packet.getBody(), packet.getBodyLength());
+	}
 	else if (packet.getType() == PacketFactory::kEnterPlaying)
 	{
 		cout << "packet : [EnterPlayingPacket]  from : " << from.toString() << endl;
@@ -137,7 +142,7 @@ void NetworkManagerClient::handleJoinedPacket(
 	{
 		std::cout
 			<< "id :  " << data->user()->id() << std::endl
-			<< "name :  " << data->user()->name() << std::endl
+			<< "name :  " << data->user()->name()->c_str() << std::endl
 			<< "appointedID :  " << data->appointed()->appointedID() << std::endl
 			<< "changed :  " << data->appointed()->changed() << std::endl
 			<< std::endl;
@@ -164,7 +169,6 @@ void NetworkManagerClient::handleNotifyDisconnectedPacket(
 	const uint8_t* buffer,
 	size_t length)
 {
-	std::cout << "handleNotifyDisconnectedPacket" << std::endl;
 	auto data = Data::GetDisconnectedData(buffer);
 	
 	std::cout
@@ -175,12 +179,24 @@ void NetworkManagerClient::handleNotifyDisconnectedPacket(
 
 }
 
+void NetworkManagerClient::handleEnterStartingPacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
+{
+	std::cout << "loading game world .. " << std::endl;
+
+	GamePacket& packet = PacketFactory::createPacket(PacketFactory::kReady);
+	send(packet, from);
+}
+
 void NetworkManagerClient::handleEnterPlayingPacket(
 	const SocketAddress& from,
 	const uint8_t* buffer,
 	size_t length)
 {
 	_state = kPlaying;
+	std::cout << "state changed to \"kPlaying\"" << std::endl;
 }
 
 

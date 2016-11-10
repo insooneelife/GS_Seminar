@@ -18,7 +18,8 @@ public:
 		kJoined,				// UserData, AppointedData
 		kMessage,				// UserData, string(msg)
 		kNotifyDisconnected,	// int(disconnectedID), AppointedData 
-		kEnterPlaying, 
+		kEnterPlaying,
+		kEnterStarting,
 		kFull,
 		kRequestStart, 
 		kReady,

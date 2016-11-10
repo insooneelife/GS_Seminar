@@ -72,6 +72,16 @@ void NetworkManagerServer::handlePacketByType(const GamePacket& packet, const So
 		cout << "packet : [Disconnection]  from : " << from.toString() << endl;
 		handleDisconnectionPacket(from, packet.getBody(), packet.getBodyLength());
 	}
+	else if (packet.getType() == PacketFactory::kRequestStart)
+	{
+		cout << "packet : [RequestStart]  from : " << from.toString() << endl;
+		handleRequestStartPacket(from, packet.getBody(), packet.getBodyLength());
+	}
+	else if (packet.getType() == PacketFactory::kReady)
+	{
+		cout << "packet : [Ready]  from : " << from.toString() << endl;
+		handleReadyPacket(from, packet.getBody(), packet.getBodyLength());
+	}
 	else
 	{
 		cout << "can't handle this packet : " << packet.getType() << std::endl;
@@ -98,7 +108,7 @@ void NetworkManagerServer::handleHelloPacket(
 	// Appoint new room master
 	auto find = _clients.find(_appointed_id);
 	bool change = false;
-	int appointed_id = 0;
+
 	if (find != end(_clients))
 	{
 		change = false;
@@ -106,11 +116,12 @@ void NetworkManagerServer::handleHelloPacket(
 	else
 	{
 		change = true;
-		appointed_id = client_id;
+		_appointed_id = client_id;
+		std::cout << "appointed : " << _appointed_id << std::endl;
 	}
 
 	// Response to all
-	GamePacket& packet = PacketFactory::createJoinedPacket(client_id, name, appointed_id, change);
+	GamePacket& packet = PacketFactory::createJoinedPacket(client_id, name, _appointed_id, change);
 	for (auto c : _clients)
 		send(packet, c.second);
 }
@@ -142,23 +153,30 @@ void NetworkManagerServer::handleDisconnectionPacket(
 {
 	auto iter = _address_to_id.find(from);
 	int id = iter->second;
+	bool change = false;
+
 	removeClient(from);
 
-	int new_appointed_id = 0;
+	// 방장이 나간경우
 	if (id == _appointed_id)
 	{
+		// 남은 인원이 있는 경우 방장 교체
 		if (_clients.size() > 0)
 		{
+			_appointed_id = begin(_clients)->first;
+			change = true;
 		}
+		// 아무도 없는 경우
 		else
 		{
 			std::cout << "close this room" << std::endl;
 		}
 	}
 
-	//GamePacket& packet = PacketFactory::createNotifyDisconnectedPacket(id, new_appointed_id, )
-	//for(auto c : _clients)
-	//	send()
+	GamePacket& packet = PacketFactory::createNotifyDisconnectedPacket(id, _appointed_id, change);
+
+	for (auto c : _clients)
+		send(packet, c.second);
 }
 
 void NetworkManagerServer::handleRequestStartPacket(
@@ -167,6 +185,11 @@ void NetworkManagerServer::handleRequestStartPacket(
 	size_t length)
 {
 	_state = kStarting;
+	std::cout << "state changed to \"kStarting\"" << std::endl;
+
+	GamePacket& packet = PacketFactory::createPacket(PacketFactory::kEnterStarting);
+	for (auto c : _clients)
+		send(packet, c.second);
 }
 
 void NetworkManagerServer::handleReadyPacket(
@@ -176,8 +199,17 @@ void NetworkManagerServer::handleReadyPacket(
 {
 	int id = _address_to_id[from];
 	_ready_set.insert(id);
+
+	std::cout << id << " is ready!" << std::endl;
+
+	// if all clients are ready.
 	if (_ready_set.size() == _clients.size())
 	{
 		_state = kPlaying;
+		std::cout << "state changed to \"kPlaying\"" << std::endl;
+
+		GamePacket& packet = PacketFactory::createPacket(PacketFactory::kEnterPlaying);
+		for (auto c : _clients)
+			send(packet, c.second);
 	}
 }

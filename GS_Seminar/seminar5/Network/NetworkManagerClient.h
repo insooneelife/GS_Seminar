@@ -29,6 +29,7 @@ public:
 	void handleJoinedPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleMessagePacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleNotifyDisconnectedPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
+	void handleEnterStartingPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleEnterPlayingPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 
 private:

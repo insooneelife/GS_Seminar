@@ -26,8 +26,10 @@ public:
 	virtual void handlePacketByType(const GamePacket& packet, const SocketAddress& from) override;
 
 	void handleMessagePacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
-	void handleLoginPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
+	void handleHelloPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleDisconnectionPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
+	void handleRequestStartPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
+	void handleReadyPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 
 private:
 

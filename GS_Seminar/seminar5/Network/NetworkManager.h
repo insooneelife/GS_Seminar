@@ -13,6 +13,12 @@
 class NetworkManager
 {
 public:
+
+	enum States
+	{
+		kLobby, kWaitingRoom, kStarting, kPlaying
+	};
+
 	class ReceivedPacket
 	{
 	public:
@@ -22,8 +28,8 @@ public:
 			_from_address(std::move(address))
 		{}
 
-		const GamePacket& GetPacket() const { return *_packet; }
-		const SocketAddress& GetFromAddress() const { return *_from_address; }
+		const GamePacket& getPacket() const { return *_packet; }
+		const SocketAddress& getFromAddress() const { return *_from_address; }
 
 	private:
 		std::unique_ptr<GamePacket> _packet;
@@ -31,7 +37,7 @@ public:
 	};
 
 
-	NetworkManager() : _socket(nullptr), _address(nullptr) {}
+	NetworkManager() : _socket(nullptr), _address(nullptr), _state(kLobby) {}
 	virtual ~NetworkManager()
 	{
 		SocketUtil::cleanUp(); 
@@ -47,5 +53,7 @@ protected:
 	std::unique_ptr<UDPSocket> _socket;
 	std::unique_ptr<SocketAddress> _address;
 	std::queue< ReceivedPacket, std::list< ReceivedPacket > > _packetQ;
+
+	States _state;
 };
 

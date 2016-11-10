@@ -40,6 +40,13 @@
     <ClInclude Include="seminar5\Socket\TCPSocket.h" />
     <ClInclude Include="seminar5\Socket\UDPSocket.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="seminar5\flatbuffers\resources\AppointedData.fbs" />
+    <None Include="seminar5\flatbuffers\resources\DisconnectedData.fbs" />
+    <None Include="seminar5\flatbuffers\resources\JoinedData.fbs" />
+    <None Include="seminar5\flatbuffers\resources\MessageData.fbs" />
+    <None Include="seminar5\flatbuffers\resources\UserData.fbs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8E433FC7-13B6-43CE-9497-289F65DF7A45}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

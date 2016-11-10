@@ -3,21 +3,35 @@
 #include <string>
 #include <functional>
 #include "../flatbuffers/GamePacket.hpp"
-#include "../flatbuffers/Packets/LoginPacket_generated.h"
-#include "../flatbuffers/Packets/MessagePacket_generated.h"
-#include "../flatbuffers/Packets/OkayPacket_generated.h"
+#include "../flatbuffers/Data/AppointedData_generated.h"
+#include "../flatbuffers/Data/DisconnectedData_generated.h"
+#include "../flatbuffers/Data/MessageData_generated.h"
+#include "../flatbuffers/Data/UserData_generated.h"
+#include "../flatbuffers/Data/JoinedData_generated.h"
 
 class PacketFactory
 {
 public:
 	enum PacketType
 	{
-		kDisconnection, kLogin, kOkay, kMessage
+		kHello,					// UserData
+		kJoined,				// UserData, AppointedData
+		kMessage,				// UserData, string(msg)
+		kNotifyDisconnected,	// int(disconnectedID), AppointedData 
+		kEnterPlaying, 
+		kFull,
+		kRequestStart, 
+		kReady,
+		kDisconnection
 	};
 
-	static GamePacket createLoginPacket(const std::string& name);
-	static GamePacket createOkayPacket(int id);
-	static GamePacket createMessagePacket(const std::string& name, const std::string& message);
+	static GamePacket createPacket(PacketType type);
+	static GamePacket createHelloPacket(int id, const std::string& name);
+	static GamePacket createJoinedPacket(int id, const std::string& name, int appointedID, bool changed);
+	static GamePacket createMessagePacket(int id, const std::string& name, const std::string& message);
+	static GamePacket createNotifyDisconnectedPacket(int disconnectdID, int appointedID, bool changed);
+
+
 
 	PacketFactory() {}
 	~PacketFactory() {};

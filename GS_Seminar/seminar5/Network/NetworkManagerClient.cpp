@@ -29,14 +29,15 @@ NetworkManagerClient::NetworkManagerClient(const std::string& client_name)
 
 bool NetworkManagerClient::init(const string& server_addr)
 {
+	_state = kLobby;
+
 	// 자신의 주소 등록
 	_socket->bind(*_address);
 
 	// Server의 주소를 생성한다.
 	_server_address.reset(SocketAddress::createFromString(server_addr));
 
-	// Server에 로그인 요청을 한다.
-	GamePacket& packet = PacketFactory::createLoginPacket(_client_name);
+	GamePacket& packet = PacketFactory::createHelloPacket(_id, _client_name);
 	send(packet, *_server_address);
 
 	return true;
@@ -55,7 +56,7 @@ void NetworkManagerClient::update()
 		// Enter 입력 시
 		if (ch == 13)
 		{
-			GamePacket& packet = PacketFactory::createMessagePacket(_client_name, _input_message);
+			GamePacket& packet = PacketFactory::createMessagePacket(_id, _client_name, _input_message);
 			send(packet, *_server_address);
 
 			_input_message = "";
@@ -69,17 +70,28 @@ void NetworkManagerClient::update()
 	handleQueuedPackets();
 }
 
-void NetworkManagerClient::handlePacketByType(const GamePacket& packet, const SocketAddress& from)
+void NetworkManagerClient::handlePacketByType(
+	const GamePacket& packet, const SocketAddress& from)
 {
-	if (packet.getType() == PacketFactory::kOkay)
+	if (packet.getType() == PacketFactory::kJoined)
 	{
-		cout << "packet : [OkayPacket]  from : " << from.toString() << endl;
-		handleOkayPacket(from, packet.getBody(), packet.getBodyLength());
+		cout << "packet : [JoinedPacket]  from : " << from.toString() << endl;
+		handleJoinedPacket(from, packet.getBody(), packet.getBodyLength());
 	}
 	else if (packet.getType() == PacketFactory::kMessage)
 	{
 		cout << "packet : [MessagePacket]  from : " << from.toString() << endl;
 		handleMessagePacket(from, packet.getBody(), packet.getBodyLength());
+	}
+	else if (packet.getType() == PacketFactory::kNotifyDisconnected)
+	{
+		cout << "packet : [NotifyDisconnectedPacket]  from : " << from.toString() << endl;
+		handleNotifyDisconnectedPacket(from, packet.getBody(), packet.getBodyLength());
+	}
+	else if (packet.getType() == PacketFactory::kEnterPlaying)
+	{
+		cout << "packet : [EnterPlayingPacket]  from : " << from.toString() << endl;
+		handleEnterPlayingPacket(from, packet.getBody(), packet.getBodyLength());
 	}
 	else
 	{
@@ -88,22 +100,27 @@ void NetworkManagerClient::handlePacketByType(const GamePacket& packet, const So
 	cout << endl;
 }
 
-void NetworkManagerClient::handleOkayPacket(
+void NetworkManagerClient::handleJoinedPacket(
 	const SocketAddress& from,
-	const uint8_t* buffer,
+	const uint8_t* buffer, 
 	size_t length)
 {
 	// Verify
-	assert(Packets::VerifyOkayPacketBuffer(flatbuffers::Verifier(buffer, length)) &&
-		"Verify failed [OkayPacket]!");
+	assert(Data::VerifyJoinedDataBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [JoinedData]!");
 
 	// Process packet logic
 	_socket->setNoneBlockingMode(true);
 
-	auto data = Packets::GetOkayPacket(buffer);
-	_id = data->id();
-
-	cout << "my id : " << _id << endl;
+	auto data = Data::GetJoinedData(buffer);
+	
+	if (_state == kLobby)
+	{
+		_state = kWaitingRoom;
+		_id = data->user()->id();
+	}
+	else
+	{}
 }
 
 void NetworkManagerClient::handleMessagePacket(
@@ -112,12 +129,29 @@ void NetworkManagerClient::handleMessagePacket(
 	size_t length)
 {
 	// Verify
-	assert(Packets::VerifyMessagePacketBuffer(flatbuffers::Verifier(buffer, length)) &&
-		"Verify failed [MessagePacket]!");
+	assert(Data::VerifyMessageDataBuffer(flatbuffers::Verifier(buffer, length)) &&
+	"Verify failed [MessageData]!");
 
 	// Process packet logic
-	auto data = Packets::GetMessagePacket(buffer);
-	
-	cout  << "name : " << data->name()->c_str() << "    message : " << data->message()->c_str() << endl;
+	auto data = Data::GetMessageData(buffer);
+
+	cout  << "name : " << data->user()->name()->c_str() << "    message : " << data->msg()->c_str() << endl;
 }
+
+void NetworkManagerClient::handleNotifyDisconnectedPacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
+{
+	std::cout << "handleNotifyDisconnectedPacket" << std::endl;
+}
+
+void NetworkManagerClient::handleEnterPlayingPacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
+{
+	_state = kPlaying;
+}
+
 

@@ -14,9 +14,7 @@ void NetworkManager::recv()
 
 	// Nothing to read
 	if (read_bytes == 0)
-	{
-
-	}
+	{}
 	// Disconnected
 	else if (read_bytes == -WSAECONNRESET)
 	{
@@ -45,7 +43,7 @@ void NetworkManager::handleQueuedPackets()
 	while (!_packetQ.empty())
 	{
 		const ReceivedPacket& recv_packet = _packetQ.front();
-		handlePacketByType(recv_packet.GetPacket(), recv_packet.GetFromAddress());
+		handlePacketByType(recv_packet.getPacket(), recv_packet.getFromAddress());
 		_packetQ.pop();
 	}
 }

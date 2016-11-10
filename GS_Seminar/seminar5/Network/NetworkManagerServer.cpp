@@ -22,6 +22,7 @@ NetworkManagerServer::NetworkManagerServer(uint16_t port)
 
 bool NetworkManagerServer::init()
 {
+	_state = kWaitingRoom;
 	_socket->bind(*_address);
 	_socket->setNoneBlockingMode(true);
 	return true;
@@ -32,18 +33,16 @@ void NetworkManagerServer::update()
 {
 	recv();
 
-	// process other logics ..
-
 	handleQueuedPackets();
 }
 
 
 void NetworkManagerServer::handlePacketByType(const GamePacket& packet, const SocketAddress& from)
 {
-	if (packet.getType() == PacketFactory::kLogin)
+	if (packet.getType() == PacketFactory::kHello)
 	{
 		cout << "packet : [LoginPacket]  from : " << from.toString() << endl;
-		handleLoginPacket(from, packet.getBody(), packet.getBodyLength());
+		handleHelloPacket(from, packet.getBody(), packet.getBodyLength());
 		
 	}
 	else if (packet.getType() == PacketFactory::kMessage)
@@ -63,25 +62,27 @@ void NetworkManagerServer::handlePacketByType(const GamePacket& packet, const So
 	cout << endl;
 }
 
-void NetworkManagerServer::handleLoginPacket(
+void NetworkManagerServer::handleHelloPacket(
 	const SocketAddress& from,
 	const uint8_t* buffer, 
 	size_t length)
 {
 	// Verify
-	assert(Packets::VerifyLoginPacketBuffer(flatbuffers::Verifier(buffer, length)) &&
-		"Verify failed [LoginPacket]!");
+	assert(Data::VerifyUserDataBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [UserData]!");
 
 	// Process packet logic
 	int client_id = _clients.size() + 1;
-	auto data = Packets::GetLoginPacket(buffer);
+	auto data = Data::GetUserData(buffer);
 	std::string name = data->name()->c_str();
 
 	insertClient(client_id, from, name);
 	
 	// Response
-	GamePacket& packet = PacketFactory::createOkayPacket(client_id);
-	send(packet, from);
+	// 방장에 대한 처리
+
+	//GamePacket& packet = PacketFactory::createJoinedPacket(client_id, name, );
+	//send(packet, from);
 }
 
 void NetworkManagerServer::handleMessagePacket(
@@ -90,16 +91,16 @@ void NetworkManagerServer::handleMessagePacket(
 	size_t length)
 {
 	// Verify
-	assert(Packets::VerifyMessagePacketBuffer(flatbuffers::Verifier(buffer, length)) &&
-		"Verify failed [MessagePacket]!");
+	assert(Data::VerifyMessageDataBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [MessageData]!");
 
 	// Process packet logic
-	auto data = Packets::GetMessagePacket(buffer);
-	string name = data->name()->c_str();
-	string message = data->message()->c_str();
+	auto data = Data::GetMessageData(buffer);
+	string name = data->user()->name()->c_str();
+	string message = data->msg()->c_str();
 
 	// Response to all
-	GamePacket& packet = PacketFactory::createMessagePacket(name, message);
+	GamePacket& packet = PacketFactory::createMessagePacket(data->user()->id(), name, message);
 	for (auto c : _clients)
 	{
 		send(packet, c.second);
@@ -113,3 +114,15 @@ void NetworkManagerServer::handleDisconnectionPacket(
 {
 	removeClient(from);
 }
+
+void NetworkManagerServer::handleRequestStartPacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
+{}
+
+void NetworkManagerServer::handleReadyPacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
+{}

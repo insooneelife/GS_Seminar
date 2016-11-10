@@ -13,6 +13,9 @@
     <Filter Include="seminar5\Socket">
       <UniqueIdentifier>{e6df4dae-04e6-4765-ad07-90485f705d40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="seminar5\data">
+      <UniqueIdentifier>{348e8c66-6613-4817-bbea-cb61c386e407}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="seminar5\main.cpp">
@@ -71,5 +74,22 @@
     <ClInclude Include="seminar5\Network\NetworkManager.h">
       <Filter>seminar5\Network</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="seminar5\flatbuffers\resources\AppointedData.fbs">
+      <Filter>seminar5\data</Filter>
+    </None>
+    <None Include="seminar5\flatbuffers\resources\DisconnectedData.fbs">
+      <Filter>seminar5\data</Filter>
+    </None>
+    <None Include="seminar5\flatbuffers\resources\MessageData.fbs">
+      <Filter>seminar5\data</Filter>
+    </None>
+    <None Include="seminar5\flatbuffers\resources\UserData.fbs">
+      <Filter>seminar5\data</Filter>
+    </None>
+    <None Include="seminar5\flatbuffers\resources\JoinedData.fbs">
+      <Filter>seminar5\data</Filter>
+    </None>
   </ItemGroup>
 </Project>

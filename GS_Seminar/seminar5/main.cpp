@@ -5,20 +5,20 @@
 
 int main()
 {
-	std::cout << "Server" << std::endl;
+	/*std::cout << "Server" << std::endl;
 	NetworkManagerServer::staticInit(8000);
 	while (1)
-		NetworkManagerServer::instance->update();
+		NetworkManagerServer::instance->update();*/
 		
 
 	
-	//std::cout << "Client" << std::endl;
-	//std::cout<<"Your name : "<<std::endl;
-	//std::string name;
-	//std::cin >> name;
-	//NetworkManagerClient::staticInit("127.0.0.1:8000", name);
-	//while (1)
-	//	NetworkManagerClient::instance->update();
+	std::cout << "Client" << std::endl;
+	std::cout<<"Your name : "<<std::endl;
+	std::string name;
+	std::cin >> name;
+	NetworkManagerClient::staticInit("127.0.0.1:8000", name);
+	while (1)
+		NetworkManagerClient::instance->update();
 	
 		
 

@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <set>
 #include "PacketFactory.h"
 #include "NetworkManager.h"
 #include "../Socket/UDPSocket.h"
@@ -65,5 +66,9 @@ private:
 	std::unordered_map<int, SocketAddress> _clients;
 	std::unordered_map<SocketAddress, int> _address_to_id;
 	std::unordered_map<int, std::string> _id_to_name;
+
+	int _appointed_id;
+	std::set<int> _ready_set;
+	int _time;
 };
 

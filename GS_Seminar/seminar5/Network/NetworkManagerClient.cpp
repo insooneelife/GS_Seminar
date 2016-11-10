@@ -47,7 +47,12 @@ bool NetworkManagerClient::init(const string& server_addr)
 void NetworkManagerClient::update()
 {
 	recv();
+	processInput();
+	handleQueuedPackets();
+}
 
+void NetworkManagerClient::processInput()
+{
 	if (_kbhit())
 	{
 		char ch = _getch();
@@ -56,8 +61,17 @@ void NetworkManagerClient::update()
 		// Enter ют╥б ╫ц
 		if (ch == 13)
 		{
-			GamePacket& packet = PacketFactory::createMessagePacket(_id, _client_name, _input_message);
-			send(packet, *_server_address);
+			if (_input_message == "--Start")
+			{
+				GamePacket& packet = 
+					PacketFactory::createPacket(PacketFactory::kRequestStart);
+				send(packet, *_server_address);
+			}
+			else
+			{
+				GamePacket& packet = PacketFactory::createMessagePacket(_id, _client_name, _input_message);
+				send(packet, *_server_address);
+			}
 
 			_input_message = "";
 		}
@@ -66,9 +80,8 @@ void NetworkManagerClient::update()
 			_input_message += ch;
 		}
 	}
-
-	handleQueuedPackets();
 }
+
 
 void NetworkManagerClient::handlePacketByType(
 	const GamePacket& packet, const SocketAddress& from)
@@ -118,9 +131,17 @@ void NetworkManagerClient::handleJoinedPacket(
 	{
 		_state = kWaitingRoom;
 		_id = data->user()->id();
+		std::cout << "state changed to \"kWaitingRoom\"" << std::endl;
 	}
 	else
-	{}
+	{
+		std::cout
+			<< "id :  " << data->user()->id() << std::endl
+			<< "name :  " << data->user()->name() << std::endl
+			<< "appointedID :  " << data->appointed()->appointedID() << std::endl
+			<< "changed :  " << data->appointed()->changed() << std::endl
+			<< std::endl;
+	}
 }
 
 void NetworkManagerClient::handleMessagePacket(
@@ -144,6 +165,14 @@ void NetworkManagerClient::handleNotifyDisconnectedPacket(
 	size_t length)
 {
 	std::cout << "handleNotifyDisconnectedPacket" << std::endl;
+	auto data = Data::GetDisconnectedData(buffer);
+	
+	std::cout
+		<< "appointedID :  " << data->appointed()->appointedID() << std::endl
+		<< "change :  " << data->appointed()->changed() << std::endl
+		<< "disconnectedID :  " << data->disconnectedID() << std::endl
+		<< std::endl;
+
 }
 
 void NetworkManagerClient::handleEnterPlayingPacket(

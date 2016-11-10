@@ -22,11 +22,14 @@ public:
 
 	bool init(const std::string& server_addr);
 	void update();
+	void processInput();
 	
 	virtual void handlePacketByType(const GamePacket& packet, const SocketAddress& from) override;
 
-	void handleOkayPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
+	void handleJoinedPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleMessagePacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
+	void handleNotifyDisconnectedPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
+	void handleEnterPlayingPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 
 private:
 

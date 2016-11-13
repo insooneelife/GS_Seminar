@@ -17,12 +17,13 @@ struct JoinedData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_USER = 4,
     VT_APPOINTED = 6
   };
-  const Data::UserData *user() const { return GetPointer<const Data::UserData *>(VT_USER); }
+  const flatbuffers::Vector<flatbuffers::Offset<Data::UserData>> *user() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Data::UserData>> *>(VT_USER); }
   const Data::AppointedData *appointed() const { return GetPointer<const Data::AppointedData *>(VT_APPOINTED); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<flatbuffers::uoffset_t>(verifier, VT_USER) &&
-           verifier.VerifyTable(user()) &&
+           verifier.Verify(user()) &&
+           verifier.VerifyVectorOfTables(user()) &&
            VerifyField<flatbuffers::uoffset_t>(verifier, VT_APPOINTED) &&
            verifier.VerifyTable(appointed()) &&
            verifier.EndTable();
@@ -32,7 +33,7 @@ struct JoinedData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct JoinedDataBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_user(flatbuffers::Offset<Data::UserData> user) { fbb_.AddOffset(JoinedData::VT_USER, user); }
+  void add_user(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Data::UserData>>> user) { fbb_.AddOffset(JoinedData::VT_USER, user); }
   void add_appointed(flatbuffers::Offset<Data::AppointedData> appointed) { fbb_.AddOffset(JoinedData::VT_APPOINTED, appointed); }
   JoinedDataBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   JoinedDataBuilder &operator=(const JoinedDataBuilder &);
@@ -43,12 +44,18 @@ struct JoinedDataBuilder {
 };
 
 inline flatbuffers::Offset<JoinedData> CreateJoinedData(flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<Data::UserData> user = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Data::UserData>>> user = 0,
     flatbuffers::Offset<Data::AppointedData> appointed = 0) {
   JoinedDataBuilder builder_(_fbb);
   builder_.add_appointed(appointed);
   builder_.add_user(user);
   return builder_.Finish();
+}
+
+inline flatbuffers::Offset<JoinedData> CreateJoinedDataDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<Data::UserData>> *user = nullptr,
+    flatbuffers::Offset<Data::AppointedData> appointed = 0) {
+  return CreateJoinedData(_fbb, user ? _fbb.CreateVector<flatbuffers::Offset<Data::UserData>>(*user) : 0, appointed);
 }
 
 inline const Data::JoinedData *GetJoinedData(const void *buf) { return flatbuffers::GetRoot<Data::JoinedData>(buf); }

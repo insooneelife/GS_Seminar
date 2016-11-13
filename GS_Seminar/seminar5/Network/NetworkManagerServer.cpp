@@ -120,10 +120,22 @@ void NetworkManagerServer::handleHelloPacket(
 		std::cout << "appointed : " << _appointed_id << std::endl;
 	}
 
-	// Response to all
-	GamePacket& packet = PacketFactory::createJoinedPacket(client_id, name, _appointed_id, change);
+	// Make other users data
+	std::vector<std::pair<int, std::string>> users;
+	for (const auto& c : _clients)
+	{
+		int id = c.first;
+		users.push_back(std::make_pair(id, _id_to_name[id]));
+	}
+	// Response to joined client with other users data
+	GamePacket& joined = PacketFactory::createJoinedPacket(users, _appointed_id, change);
+	send(joined, from);
+
+	// Response to all other clients
+	GamePacket& intro = PacketFactory::createIntroPacket(client_id, name, _appointed_id, change);
 	for (auto c : _clients)
-		send(packet, c.second);
+		if(c.first != client_id)
+			send(intro, c.second);
 }
 
 void NetworkManagerServer::handleMessagePacket(

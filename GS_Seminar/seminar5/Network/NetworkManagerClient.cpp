@@ -86,7 +86,12 @@ void NetworkManagerClient::processInput()
 void NetworkManagerClient::handlePacketByType(
 	const GamePacket& packet, const SocketAddress& from)
 {
-	if (packet.getType() == PacketFactory::kJoined)
+	if (packet.getType() == PacketFactory::kIntro)
+	{
+		cout << "packet : [IntroPacket]  from : " << from.toString() << endl;
+		handleIntroPacket(from, packet.getBody(), packet.getBodyLength());
+	}
+	else if (packet.getType() == PacketFactory::kJoined)
 	{
 		cout << "packet : [JoinedPacket]  from : " << from.toString() << endl;
 		handleJoinedPacket(from, packet.getBody(), packet.getBodyLength());
@@ -118,35 +123,53 @@ void NetworkManagerClient::handlePacketByType(
 	cout << endl;
 }
 
-void NetworkManagerClient::handleJoinedPacket(
+void NetworkManagerClient::handleIntroPacket(
 	const SocketAddress& from,
 	const uint8_t* buffer, 
 	size_t length)
 {
 	// Verify
-	assert(Data::VerifyJoinedDataBuffer(flatbuffers::Verifier(buffer, length)) &&
-		"Verify failed [JoinedData]!");
+	assert(Data::VerifyIntroDataBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [IntroData]!");
 
 	// Process packet logic
 	_socket->setNoneBlockingMode(true);
 
+	auto data = Data::GetIntroData(buffer);
+	
+	std::cout
+		<< "new client" << std::endl
+		<< "id :  " << data->user()->id() << std::endl
+		<< "name :  " << data->user()->name()->c_str() << std::endl
+		<< "appointedID :  " << data->appointed()->appointedID() << std::endl
+		<< "changed :  " << data->appointed()->changed() << std::endl
+		<< std::endl;
+	
+}
+
+void NetworkManagerClient::handleJoinedPacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
+{
+	// Verify
+	assert(Data::VerifyJoinedDataBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [oinedData]!");
+
 	auto data = Data::GetJoinedData(buffer);
 	
-	if (_state == kLobby)
+	std::cout
+		<< "appointed id : " << data->appointed()->appointedID() << std::endl
+		<< "changed : " << data->appointed()->changed() << std::endl
+		<< std::endl;
+
+	std::cout << "[users list]" << std::endl;
+	for (auto i = data->user()->begin(); i != data->user()->end(); ++i)
 	{
-		_state = kWaitingRoom;
-		_id = data->user()->id();
-		std::cout << "state changed to \"kWaitingRoom\"" << std::endl;
+		std::cout << i->id() << " " << i->name()->c_str() << std::endl;
 	}
-	else
-	{
-		std::cout
-			<< "id :  " << data->user()->id() << std::endl
-			<< "name :  " << data->user()->name()->c_str() << std::endl
-			<< "appointedID :  " << data->appointed()->appointedID() << std::endl
-			<< "changed :  " << data->appointed()->changed() << std::endl
-			<< std::endl;
-	}
+	std::cout << std::endl;
+	
 }
 
 void NetworkManagerClient::handleMessagePacket(

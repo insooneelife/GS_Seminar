@@ -3,10 +3,10 @@ include "AppointedData.fbs";
 
 namespace Data;
 
-table JoinedData 
+table IntroData 
 {
 	user:UserData;
 	appointed:AppointedData;
 }
 
-root_type JoinedData;
+root_type IntroData;

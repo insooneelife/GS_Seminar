@@ -5,7 +5,7 @@ namespace Data;
 
 table JoinedData 
 {
-	user:UserData;
+	user:[UserData];
 	appointed:AppointedData;
 }
 

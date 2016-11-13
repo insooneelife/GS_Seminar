@@ -5,11 +5,12 @@
 
 int main()
 {
-	/*std::cout << "Server" << std::endl;
+	/*
+	std::cout << "Server" << std::endl;
 	NetworkManagerServer::staticInit(8000);
 	while (1)
-		NetworkManagerServer::instance->update();*/
-		
+		NetworkManagerServer::instance->update();
+	*/	
 
 	
 	std::cout << "Client" << std::endl;

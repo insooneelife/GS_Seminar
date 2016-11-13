@@ -82,13 +82,16 @@
     <None Include="seminar5\flatbuffers\resources\DisconnectedData.fbs">
       <Filter>seminar5\data</Filter>
     </None>
+    <None Include="seminar5\flatbuffers\resources\IntroData.fbs">
+      <Filter>seminar5\data</Filter>
+    </None>
+    <None Include="seminar5\flatbuffers\resources\JoinedData.fbs">
+      <Filter>seminar5\data</Filter>
+    </None>
     <None Include="seminar5\flatbuffers\resources\MessageData.fbs">
       <Filter>seminar5\data</Filter>
     </None>
     <None Include="seminar5\flatbuffers\resources\UserData.fbs">
-      <Filter>seminar5\data</Filter>
-    </None>
-    <None Include="seminar5\flatbuffers\resources\JoinedData.fbs">
       <Filter>seminar5\data</Filter>
     </None>
   </ItemGroup>

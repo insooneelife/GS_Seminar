@@ -132,9 +132,6 @@ void NetworkManagerClient::handleIntroPacket(
 	assert(Data::VerifyIntroDataBuffer(flatbuffers::Verifier(buffer, length)) &&
 		"Verify failed [IntroData]!");
 
-	// Process packet logic
-	_socket->setNoneBlockingMode(true);
-
 	auto data = Data::GetIntroData(buffer);
 	
 	std::cout
@@ -154,10 +151,13 @@ void NetworkManagerClient::handleJoinedPacket(
 {
 	// Verify
 	assert(Data::VerifyJoinedDataBuffer(flatbuffers::Verifier(buffer, length)) &&
-		"Verify failed [oinedData]!");
+		"Verify failed [JoinedData]!");
 
 	auto data = Data::GetJoinedData(buffer);
 	
+	// Process packet logic
+	_socket->setNoneBlockingMode(true);
+
 	std::cout
 		<< "appointed id : " << data->appointed()->appointedID() << std::endl
 		<< "changed : " << data->appointed()->changed() << std::endl

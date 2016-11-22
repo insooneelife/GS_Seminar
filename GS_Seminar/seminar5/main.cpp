@@ -5,6 +5,7 @@
 
 int main()
 {
+	
 	/*
 	std::cout << "Server" << std::endl;
 	NetworkManagerServer::staticInit(8000);

@@ -15,14 +15,13 @@ class NetworkManagerRoomServer : public NetworkManager
 {
 public:
 	static std::unique_ptr<NetworkManagerRoomServer> instance;
-	static void staticInit(uint16_t port);
+	static void staticInit(int number, const std::string& server_addr);
 
-	NetworkManagerRoomServer(uint16_t port);
+	NetworkManagerRoomServer(int number);
 	virtual ~NetworkManagerRoomServer() {}
 
-	bool init();
+	bool init(const std::string& server_addr);
 	void update();
-
 
 	virtual void handlePacketByType(const GamePacket& packet, const SocketAddress& from) override;
 
@@ -67,6 +66,9 @@ private:
 	std::unordered_map<SocketAddress, int> _address_to_id;
 	std::unordered_map<int, std::string> _id_to_name;
 
+	std::unique_ptr<SocketAddress> _lobby_server_address;
+
+	int _room_number;
 	int _appointed_id;
 	std::set<int> _ready_set;
 	int _time;

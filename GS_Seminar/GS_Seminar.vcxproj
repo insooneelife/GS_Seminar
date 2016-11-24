@@ -37,6 +37,7 @@
     <ClInclude Include="seminar6\Network\NetworkManagerLobbyServer.h" />
     <ClInclude Include="seminar6\Network\NetworkManagerRoomServer.h" />
     <ClInclude Include="seminar6\Network\PacketFactory.h" />
+    <ClInclude Include="seminar6\Network\Process.h" />
     <ClInclude Include="seminar6\Socket\SocketAddress.h" />
     <ClInclude Include="seminar6\Socket\SocketUtil.h" />
     <ClInclude Include="seminar6\Socket\TCPSocket.h" />

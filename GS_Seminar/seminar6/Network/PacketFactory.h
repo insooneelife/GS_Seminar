@@ -33,6 +33,8 @@ public:
 		kDisconnection,
 
 		kCreateRoom,
+		kRoomIntro,
+		kJoinRoom,
 		kRoomIsCreated,
 		kRoomInfo,
 
@@ -50,6 +52,8 @@ public:
 	static GamePacket createNotifyDisconnectedPacket(int disconnectdID, int appointedID, bool changed);
 
 	static GamePacket createCreateRoomPacket(int id, const std::string& name);
+	static GamePacket createRoomIntroPacket(int number, const std::string& address);
+	static GamePacket createJoinRoomPacket(int number);
 	static GamePacket createRoomIsCreatedPacket(int number, const std::string& address);
 	static GamePacket createRoomInfoPacket(const std::vector<std::pair<int, std::string> >& rooms);
 

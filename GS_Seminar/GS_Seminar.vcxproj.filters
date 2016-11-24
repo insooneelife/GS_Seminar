@@ -80,6 +80,9 @@
     <ClInclude Include="seminar6\Socket\UDPSocket.h">
       <Filter>seminar6\Socket</Filter>
     </ClInclude>
+    <ClInclude Include="seminar6\Network\Process.h">
+      <Filter>seminar6\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="seminar6\flatbuffers\resources\AppointedData.fbs">

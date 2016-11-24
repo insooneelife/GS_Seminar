@@ -7,27 +7,37 @@ using namespace std;
 
 std::unique_ptr<NetworkManagerRoomServer> NetworkManagerRoomServer::instance = nullptr;
 
-void NetworkManagerRoomServer::staticInit(uint16_t port)
+void NetworkManagerRoomServer::staticInit(int number, const std::string& server_addr)
 {
 	SocketUtil::staticInit();
-	instance.reset(new NetworkManagerRoomServer(port));
-	instance->init();
+	instance.reset(new NetworkManagerRoomServer(number));
+	instance->init(server_addr);
 }
 
-NetworkManagerRoomServer::NetworkManagerRoomServer(uint16_t port)
+NetworkManagerRoomServer::NetworkManagerRoomServer(int number)
 	:
 	_appointed_id(0),
-	_time(0)
+	_time(0),
+	_room_number(number)
 {
 	_socket.reset(UDPSocket::create(SocketUtil::AddressFamily::INET));
-	_address.reset(new SocketAddress(INADDR_ANY, port));
+	
+	// Start with any port available.
+	_address.reset(new SocketAddress());
 }
 
-bool NetworkManagerRoomServer::init()
+bool NetworkManagerRoomServer::init(const std::string& server_addr)
 {
 	_state = kWaitingRoom;
 	_socket->bind(*_address);
 	_socket->setNoneBlockingMode(true);
+
+	_lobby_server_address.reset(SocketAddress::createFromString(server_addr));
+
+	// Notify to lobby server that room created successfully.
+	GamePacket& packet = PacketFactory::createRoomIntroPacket(_room_number, _address->toString());
+	send(packet, *_lobby_server_address);
+
 	return true;
 }
 

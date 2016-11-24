@@ -16,7 +16,7 @@ public:
 
 	enum States
 	{
-		kLobby, kWaitingRoom, kStarting, kPlaying
+		kDefault, kLobby, kWaitingRoom, kStarting, kPlaying
 	};
 
 	class ReceivedPacket
@@ -36,6 +36,16 @@ public:
 		std::unique_ptr<SocketAddress> _from_address;
 	};
 
+	template <typename Map>
+	static int genUniqueID(const Map& map)
+	{
+		int max_id = 0;
+		for (auto e : map)
+		{
+			max_id = max(max_id, e.first);
+		}
+		return max_id + 1;
+	}
 
 	NetworkManager() : _socket(nullptr), _address(nullptr), _state(kLobby) {}
 	virtual ~NetworkManager()

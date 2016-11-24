@@ -29,7 +29,7 @@ NetworkManagerClient::NetworkManagerClient(const std::string& client_name)
 
 bool NetworkManagerClient::init(const string& server_addr)
 {
-	_state = kLobby;
+	_state = kDefault;
 
 	// 자신의 주소 등록
 	_socket->bind(*_address);
@@ -71,6 +71,15 @@ void NetworkManagerClient::processInput()
 			{
 				GamePacket& packet =
 					PacketFactory::createCreateRoomPacket(_id, _client_name);
+				send(packet, *_server_address);
+			}
+			else if (_input_message == "--JoinRoom")
+			{
+				int number;
+				cout << "room number : ";
+				cin >> number;
+
+				GamePacket& packet = PacketFactory::createJoinRoomPacket(number);
 				send(packet, *_server_address);
 			}
 			else
@@ -122,6 +131,11 @@ void NetworkManagerClient::handlePacketByType(
 		cout << "packet : [EnterPlayingPacket]  from : " << from.toString() << endl;
 		handleEnterPlayingPacket(from, packet.getBody(), packet.getBodyLength());
 	}
+	else if (packet.getType() == PacketFactory::kRoomIsCreated)
+	{
+		cout << "packet : [RoomIsCreated]  from : " << from.toString() << endl;
+		handleRoomIsCreatedPacket(from, packet.getBody(), packet.getBodyLength());
+	}
 	else
 	{
 		std::cout << "can't handle this packet : " << packet.getType() << std::endl;;
@@ -139,7 +153,14 @@ void NetworkManagerClient::handleIntroPacket(
 		"Verify failed [IntroData]!");
 
 	auto data = Data::GetIntroData(buffer);
-	
+
+	if (_state == kDefault)
+	{
+		_state = kLobby;
+		_id = data->user()->id();
+		_socket->setNoneBlockingMode(true);
+	}
+
 	std::cout
 		<< "new client" << std::endl
 		<< "id :  " << data->user()->id() << std::endl
@@ -160,7 +181,7 @@ void NetworkManagerClient::handleJoinedPacket(
 		"Verify failed [JoinedData]!");
 
 	auto data = Data::GetJoinedData(buffer);
-	
+
 	// Process packet logic
 	_socket->setNoneBlockingMode(true);
 
@@ -229,3 +250,18 @@ void NetworkManagerClient::handleEnterPlayingPacket(
 }
 
 
+
+void NetworkManagerClient::handleRoomIsCreatedPacket(const SocketAddress& from, const uint8_t* buffer, size_t length)
+{
+	assert(Data::VerifyRoomDataBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [RoomData]!");
+
+	auto data = Data::GetRoomData(buffer);
+
+	std::string room_server_addr = data->address()->c_str();
+	_server_address.reset(SocketAddress::createFromString(room_server_addr));
+	std::cout << room_server_addr << std::endl;
+
+	GamePacket& packet = PacketFactory::createHelloPacket(_id, _client_name);
+	send(packet, *_server_address);
+}

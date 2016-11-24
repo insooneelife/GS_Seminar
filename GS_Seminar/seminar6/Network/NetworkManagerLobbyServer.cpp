@@ -58,6 +58,16 @@ void NetworkManagerLobbyServer::handlePacketByType(const GamePacket& packet, con
 		cout << "packet : [CreateRoom]  from : " << from.toString() << endl;
 		handleCreateRoomPacket(from, packet.getBody(), packet.getBodyLength());
 	}
+	else if (packet.getType() == PacketFactory::kRoomIntro)
+	{
+		cout << "packet : [RoomIntro]  from : " << from.toString() << endl;
+		handleRoomIntroPacket(from, packet.getBody(), packet.getBodyLength());
+	}
+	else if (packet.getType() == PacketFactory::kJoinRoom)
+	{
+		cout << "packet : [JoinRoom]  from : " << from.toString() << endl;
+		handleJoinRoomPacket(from, packet.getBody(), packet.getBodyLength());
+	}
 	else
 	{
 		cout << "can't handle this packet : " << packet.getType() << std::endl;
@@ -81,22 +91,10 @@ void NetworkManagerLobbyServer::handleHelloPacket(
 
 	insertClient(client_id, from, name);
 	
-	// Make other users data
-	std::vector<std::pair<int, std::string>> users;
-	for (const auto& c : _clients)
-	{
-		int id = c.first;
-		users.push_back(std::make_pair(id, _id_to_name[id]));
-	}
-	// Response to joined client with other users data
-	GamePacket& joined = PacketFactory::createJoinedPacket(users, 0, false);
-	send(joined, from);
-
 	// Response to all other clients
 	GamePacket& intro = PacketFactory::createIntroPacket(client_id, name, 0, false);
 	for (auto c : _clients)
-		if(c.first != client_id)
-			send(intro, c.second);
+		send(intro, c.second);
 }
 
 void NetworkManagerLobbyServer::handleMessagePacket(
@@ -124,7 +122,7 @@ void NetworkManagerLobbyServer::handleDisconnectionPacket(
 	const uint8_t* buffer,
 	size_t length)
 {
-	auto iter = _address_to_id.find(from);
+	auto iter = _clients_addr_to_id.find(from);
 	int id = iter->second;
 
 	removeClient(from);
@@ -140,7 +138,70 @@ void NetworkManagerLobbyServer::handleCreateRoomPacket(
 	const uint8_t* buffer,
 	size_t length)
 {
+	// Verify
+	assert(Data::VerifyUserDataBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [UserData]!");
 
+	// Process packet logic
+	auto data = Data::GetUserData(buffer);
+	int id = data->id();
+	string name = data->name()->c_str();
+
+	int number = genUniqueID(_rooms);
+	_room_masters.emplace(number, std::make_pair(id, from));
+
+	stringstream ss;
+	ss << number;
+
+	string filename = "GS_Seminar.exe Room " + ss.str() + " " + _address->toString();
+	createRoom(number, filename);
+}
+
+void NetworkManagerLobbyServer::handleRoomIntroPacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
+{
+	// Verify
+	assert(Data::VerifyRoomDataBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [RoomData]!");
+
+	auto data = Data::GetRoomData(buffer);
+	int number = data->number();
+	std::string address = from.toString();
+
+	insertRoom(from, number, "");
+
+	auto iter = _room_masters.find(number);
+	if (iter != std::end(_room_masters))
+	{
+		// Send that room is created to client who requested to create room.
+		GamePacket& packet = PacketFactory::createRoomIsCreatedPacket(number, address);
+		send(packet, iter->second.second);
+		removeClient(iter->second.second);
+	}
+}
+
+void NetworkManagerLobbyServer::handleJoinRoomPacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
+{
+	// Verify
+	assert(Data::VerifyRoomDataBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [RoomData]!");
+
+	auto data = Data::GetRoomData(buffer);
+	int number = data->number();
+
+	auto iter = _rooms.find(number);
+	if (iter != std::end(_rooms))
+	{
+		// Send that room is created to client who requested to create room.
+		GamePacket& packet = PacketFactory::createRoomIsCreatedPacket(number, iter->second.toString());
+		send(packet, from);
+		removeClient(iter->second);
+	}
 }
 
 void NetworkManagerLobbyServer::handleRoomHasDestroyedPacket(

@@ -92,6 +92,26 @@ GamePacket PacketFactory::createCreateRoomPacket(int id, const std::string& name
 	return GamePacket(builder, kCreateRoom);
 }
 
+GamePacket PacketFactory::createRoomIntroPacket(int number, const std::string& address)
+{
+	flatbuffers::FlatBufferBuilder builder;
+	auto faddress = builder.CreateString(address);
+	auto room_data = Data::CreateRoomData(builder, number, faddress);
+	builder.Finish(room_data);
+
+	return GamePacket(builder, kRoomIntro);
+}
+
+GamePacket PacketFactory::createJoinRoomPacket(int number)
+{
+	flatbuffers::FlatBufferBuilder builder;
+	auto faddress = builder.CreateString("");
+	auto room_data = Data::CreateRoomData(builder, number, faddress);
+	builder.Finish(room_data);
+
+	return GamePacket(builder, kJoinRoom);
+}
+
 GamePacket PacketFactory::createRoomIsCreatedPacket(int number, const std::string& address)
 {
 	flatbuffers::FlatBufferBuilder builder;

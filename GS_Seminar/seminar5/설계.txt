@@ -30,7 +30,7 @@ JoinedData
 Room Server (Waiting Room)										Client (Waiting Room)
 Handling Packets												Handling Packets
 
-Scenario 1.
+Scenario 1. (Join Protocol)
 
 Hello Packet					<-----------------------					
 								 client가 방에 입장 시							
@@ -54,18 +54,18 @@ Hello Packet					<-----------------------
 																	x
 															
 															
-Scenario 2.															
+Scenario 2.	(Message Protocol)														
 				
-Message							<-----------------------					
+Message	Packet					<-----------------------					
 								 client가 msg 입력 시							
 	MessageData (user 정보, msg 정보)											 
 																
-								--------- 0..n -------->		Message
+								--------- 0..n -------->		Message Packet
 								 방의 모든 client 에게									
 																	MessageData (user 정보, msg 정보)			
-															
-															
-Scenario 3.																
+																
+																	화면에 출력
+Scenario 3.	(Disconnection Protocol)															
 		
 Disconnected					<-----------------------					
 								 client의 연결이 끊겼을 때							
@@ -78,7 +78,7 @@ Disconnected					<-----------------------
 																	DisconnectedData (끊긴 id, 방장 변경 정보)
 
 
-Scenario 4.
+Scenario 4. (Starting Protocol)
 
 RequestStart					<-----------------------		(시작 버튼을 누름)														
 																
@@ -100,6 +100,8 @@ Ready Packet					<-----------------------
 								--------- 0..n -------->		EnterPlaying					
 															
 																	x
+																
+																Playing으로
 															
 															
 															

@@ -106,27 +106,9 @@ CreateRoom Packet				<-----------------------
 								 client가 방 생성 시							
 	UserData (방을 생성한 user 정보)
 								
-	rooms map에 nullptr로 저장 후,
 	Room server process 생성 
 	(argument 1. : room number)
 	(argument 2. : lobby server address)
-	
-	
-	
-Scenario 5. (Join Room Protocol)
-
-JoinRoom Packet					<-----------------------					
-								 client가 방 입장 시							
-	RoomData (number만 의미 있음)
-								
-								----------------------->		RoomIsCreated Packet
-								 방을 생성한 client 에게
-																	RoomData
-																	
-																	방에 입장 (Room server에 Hello Packet을 보냄)
-																	server_address를 room server의 주소로 바꾼다.
-																	
-																	
 	
 	
 RoomIntro Packet				<---------------------------------------------------------------			Room Server (WaitingRoom 상태)			
@@ -153,6 +135,25 @@ RoomIntro Packet				<-----------------------------------------------------------
 																	방에 입장 (Room server에 Hello Packet을 보냄)
 																	server_address를 room server의 주소로 바꾼다.
 	
+	
+	
+Scenario 5. (Join Room Protocol)
+
+JoinRoom Packet					<-----------------------					
+								 client가 방 입장 시							
+	RoomData (number만 의미 있음)
+								
+								----------------------->		RoomIsCreated Packet
+								 방에 참여한 client 에게
+																	RoomData
+																	
+																	방에 입장 (Room server에 Hello Packet을 보냄)
+																	server_address를 room server의 주소로 바꾼다.
+																	
+																	
+	
+	
+
 --- Room Server ---
 
 Room Server (WaitingRoom 상태)									Client (WaitingRoom 상태)					Lobby Server

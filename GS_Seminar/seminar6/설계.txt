@@ -37,15 +37,15 @@ IntroData
 
 JoinedData
 	users : [UserData];
+	joined : int
 	appoint : AppointedData
 
-	
+
+Handling Packets												Handling Packets 
 --- Lobby Server ---
 
-Lobby Server 													Client (Lobby 상태)					
-Handling Packets												Handling Packets 
-
 Scenario 1. (Join Protocol)
+Lobby Server 													Client (Lobby 상태)					
 
 Hello Packet					<-----------------------					
 								 client가 서버에 입장 시							
@@ -64,9 +64,10 @@ Hello Packet					<-----------------------
 								 로비에 입장한 client 에게								
 																	JoinedData
 																		UserData[] (이미 입장한 모든 user 정보),
+																		joined (입장한 user id)
 																		AppointedData (의미 없음)
 																
-										   ||					
+										   ||						"Lobby" 로 상태 전이
 										   
 										   
 								----------------------->		Full Packet	
@@ -74,8 +75,9 @@ Hello Packet					<-----------------------
 																	x
 															
 													
-Scenario 2.	(Chat Protocol)												
-				
+Scenario 2.	(Chat Protocol)											
+Lobby Server 													Client (Lobby, WaitingRoom, Playing 상태)
+
 Message							<-----------------------					
 								 client가 msg 입력 시							
 	MessageData (user 정보, msg 정보)											 
@@ -86,7 +88,8 @@ Message							<-----------------------
 															
 															
 Scenario 3.	(Disconnection Protocol)														
-		
+Lobby Server 													Client (Lobby, WaitingRoom, Playing 상태)
+
 Disconnected					<-----------------------					
 								 client의 연결이 끊겼을 때							
 	x		
@@ -101,6 +104,7 @@ Disconnected					<-----------------------
 	
 	
 Scenario 4. (Create Room Protocol)
+Lobby Server 													Client (Lobby)								Room Server (WaitingRoom 상태)
 
 CreateRoom Packet				<-----------------------					
 								 client가 방 생성 시							
@@ -111,7 +115,7 @@ CreateRoom Packet				<-----------------------
 	(argument 2. : lobby server address)
 	
 	
-RoomIntro Packet				<---------------------------------------------------------------			Room Server (WaitingRoom 상태)			
+RoomIntro Packet				<------------------------------------------------------------------------						
 											room server process가 성공적으로 생성 시
 	RoomData
 	
@@ -138,6 +142,7 @@ RoomIntro Packet				<-----------------------------------------------------------
 	
 	
 Scenario 5. (Join Room Protocol)
+Lobby Server 													Client (Lobby)
 
 JoinRoom Packet					<-----------------------					
 								 client가 방 입장 시							
@@ -156,10 +161,8 @@ JoinRoom Packet					<-----------------------
 
 --- Room Server ---
 
-Room Server (WaitingRoom 상태)									Client (WaitingRoom 상태)					Lobby Server
-Handling Packets												Handling Packets
-
 Scenario 1. (Join Protocol)
+Room Server (WaitingRoom 상태) 									Client (Lobby 상태)							
 
 Hello Packet					<-----------------------					
 								 client가 방에 입장 시							
@@ -180,6 +183,7 @@ Hello Packet					<-----------------------
 																	UserData[] (이미 입장한 모든 user 정보),
 																	AppointedData (방장 변경 정보)
 																
+																	"WaitingRoom" 으로 상태 전이
 										   ||					
 										   
 										   
@@ -188,7 +192,8 @@ Hello Packet					<-----------------------
 																	x
 															
 															
-Scenario 2.	(Chat Protocol)												
+Scenario 2.	(Chat Protocol)					
+Room Server (WaitingRoom 상태) 									Client (Lobby 상태)										
 				
 Message							<-----------------------					
 								 client가 msg 입력 시							
@@ -218,23 +223,24 @@ RequestStart					<-----------------------		(시작 버튼을 누름)
 								 Room server 에게								
 	x														
 	
-	Starting으로 상태 전이														
+	"Starting" 으로 상태 전이														
 								--------- 0..n -------->		EnterStarting
 								 방의 모든 client 에게									
 																	WorldData
 																	
 																	World 초기화 후,
-																	Starting으로 상태 전이	후,
+																	"Starting" 으로 상태 전이 후,
 															
 Ready Packet					<-----------------------									
 								 Server에 Ready를 알림
 	x															
 																	
-	Playing으로 상태 전이					
+	"Playing" 으로 상태 전이					
 								--------- 0..n -------->		EnterPlaying					
 															
 																	x
 															
+																	"Playing" 으로 상태 전이 후,
 															
 															
 															

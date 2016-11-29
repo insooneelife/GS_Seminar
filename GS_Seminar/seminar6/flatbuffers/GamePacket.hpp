@@ -8,7 +8,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include "flatbuffers\flatbuffers.h"
+#include "flatbuffers/flatbuffers.h"
 
 class GamePacket
 {

@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <functional>
 #include "NetworkManager.h"
 #include "PacketFactory.h"
 #include "../Socket/UDPSocket.h"
@@ -16,16 +17,14 @@ public:
 	static std::unique_ptr<NetworkManagerClient> instance;
 	static void staticInit(const std::string& server_addr, const std::string& client_name);
 
-	NetworkManagerClient(const std::string& client_name);
+	NetworkManagerClient(const std::string& client_name, const std::string& server_addr);
 	virtual ~NetworkManagerClient()
 	{}
 
-	bool init(const std::string& server_addr);
+	bool init();
 	void update();
 	void processInput();
 	
-	virtual void handlePacketByType(const GamePacket& packet, const SocketAddress& from) override;
-
 	void handleIntroPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleJoinedPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleMessagePacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
@@ -42,5 +41,6 @@ private:
 	int _id;
 	std::string _client_name;
 	std::string _input_message;
+
 };
 

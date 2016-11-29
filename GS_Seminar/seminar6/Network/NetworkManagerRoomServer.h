@@ -17,13 +17,11 @@ public:
 	static std::unique_ptr<NetworkManagerRoomServer> instance;
 	static void staticInit(int number, const std::string& server_addr);
 
-	NetworkManagerRoomServer(int number);
+	NetworkManagerRoomServer(int number, const std::string& server_addr);
 	virtual ~NetworkManagerRoomServer() {}
 
-	bool init(const std::string& server_addr);
+	bool init();
 	void update();
-
-	virtual void handlePacketByType(const GamePacket& packet, const SocketAddress& from) override;
 
 	void handleMessagePacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleHelloPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);

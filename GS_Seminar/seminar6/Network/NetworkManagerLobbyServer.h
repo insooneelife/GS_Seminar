@@ -24,12 +24,9 @@ public:
 	bool init();
 	void update();
 
-	virtual void handlePacketByType(const GamePacket& packet, const SocketAddress& from) override;
-
 	void handleHelloPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleMessagePacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleDisconnectionPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
-	
 	void handleCreateRoomPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleRoomIntroPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleJoinRoomPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);

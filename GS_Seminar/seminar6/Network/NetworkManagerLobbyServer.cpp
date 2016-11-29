@@ -4,6 +4,7 @@
 #include "NetworkManagerLobbyServer.h"
 #include "PacketFactory.h"
 using namespace std;
+using namespace std::placeholders;
 
 std::unique_ptr<NetworkManagerLobbyServer> NetworkManagerLobbyServer::instance = nullptr;
 
@@ -16,13 +17,22 @@ void NetworkManagerLobbyServer::staticInit(uint16_t port)
 
 NetworkManagerLobbyServer::NetworkManagerLobbyServer(uint16_t port)
 {
-	_socket.reset(UDPSocket::create(SocketUtil::AddressFamily::INET));
 	_address.reset(new SocketAddress(INADDR_ANY, port));
+
+	// Set with handler functions.
+	_handle_packets_map[States::kDefault][PacketFactory::kHello] = bind(&NetworkManagerLobbyServer::handleHelloPacket, this, _1, _2, _3);
+	_handle_packets_map[States::kDefault][PacketFactory::kMessage] = bind(&NetworkManagerLobbyServer::handleMessagePacket, this, _1, _2, _3);
+	_handle_packets_map[States::kDefault][PacketFactory::kDisconnection] = bind(&NetworkManagerLobbyServer::handleDisconnectionPacket, this, _1, _2, _3);
+	_handle_packets_map[States::kDefault][PacketFactory::kCreateRoom] = bind(&NetworkManagerLobbyServer::handleCreateRoomPacket, this, _1, _2, _3);
+	_handle_packets_map[States::kDefault][PacketFactory::kRoomIntro] = bind(&NetworkManagerLobbyServer::handleRoomIntroPacket, this, _1, _2, _3);
+	_handle_packets_map[States::kDefault][PacketFactory::kJoinRoom] = bind(&NetworkManagerLobbyServer::handleJoinRoomPacket, this, _1, _2, _3);
+	_handle_packets_map[States::kDefault][PacketFactory::kRequestShowRoomInfo] = bind(&NetworkManagerLobbyServer::handleRequestShowRoomInfoPacket, this, _1, _2, _3);
 }
 
+// Let's put exception occuring functions here.
 bool NetworkManagerLobbyServer::init()
 {
-	_state = kWaitingRoom;
+	_socket.reset(UDPSocket::create(SocketUtil::AddressFamily::INET));
 	_socket->bind(*_address);
 	_socket->setNoneBlockingMode(true);
 	return true;
@@ -36,50 +46,6 @@ void NetworkManagerLobbyServer::update()
 }
 
 
-void NetworkManagerLobbyServer::handlePacketByType(const GamePacket& packet, const SocketAddress& from)
-{
-	if (packet.getType() == PacketFactory::kHello)
-	{
-		cout << "packet : [HelloPacket]  from : " << from.toString() << endl;
-		handleHelloPacket(from, packet.getBody(), packet.getBodyLength());
-	}
-	else if (packet.getType() == PacketFactory::kMessage)
-	{
-		cout << "packet : [MessagePacket]  from : " << from.toString() << endl;
-		handleMessagePacket(from, packet.getBody(), packet.getBodyLength());
-	}
-	else if (packet.getType() == PacketFactory::kDisconnection)
-	{
-		cout << "packet : [Disconnection]  from : " << from.toString() << endl;
-		handleDisconnectionPacket(from, packet.getBody(), packet.getBodyLength());
-	}
-	else if (packet.getType() == PacketFactory::kCreateRoom)
-	{
-		cout << "packet : [CreateRoom]  from : " << from.toString() << endl;
-		handleCreateRoomPacket(from, packet.getBody(), packet.getBodyLength());
-	}
-	else if (packet.getType() == PacketFactory::kRoomIntro)
-	{
-		cout << "packet : [RoomIntro]  from : " << from.toString() << endl;
-		handleRoomIntroPacket(from, packet.getBody(), packet.getBodyLength());
-	}
-	else if (packet.getType() == PacketFactory::kJoinRoom)
-	{
-		cout << "packet : [JoinRoom]  from : " << from.toString() << endl;
-		handleJoinRoomPacket(from, packet.getBody(), packet.getBodyLength());
-	}
-	else if (packet.getType() == PacketFactory::kRequestShowRoomInfo)
-	{
-		cout << "packet : [RequestShowRoomInfo]  from : " << from.toString() << endl;
-		handleRequestShowRoomInfoPacket(from, packet.getBody(), packet.getBodyLength());
-	}
-	else
-	{
-		cout << "can't handle this packet : " << packet.getType() << std::endl;
-	}
-	cout << endl;
-}
-
 void NetworkManagerLobbyServer::handleHelloPacket(
 	const SocketAddress& from,
 	const uint8_t* buffer, 
@@ -90,16 +56,29 @@ void NetworkManagerLobbyServer::handleHelloPacket(
 		"Verify failed [UserData]!");
 
 	// Process packet logic
-	int client_id = _clients.size() + 1;
+	int client_id = genUniqueID(_clients);
 	auto data = Data::GetUserData(buffer);
 	std::string name = data->name()->c_str();
 
 	insertClient(client_id, from, name);
 	
-	// Response to all other clients
+	// Response to joined client.
+	vector<pair<int, string> > clients;
+	for (auto e : _id_to_name)
+	{
+		int id = e.first;
+		string name = e.second;
+		clients.emplace_back(id, name);
+	}
+
+	GamePacket& join = PacketFactory::createJoinedPacket(clients, client_id, 0, false);
+	send(join, from);
+
+	// Response to all other clients.
 	GamePacket& intro = PacketFactory::createIntroPacket(client_id, name, 0, false);
 	for (auto c : _clients)
-		send(intro, c.second);
+		if(c.first != client_id)
+			send(intro, c.second);
 }
 
 void NetworkManagerLobbyServer::handleMessagePacket(

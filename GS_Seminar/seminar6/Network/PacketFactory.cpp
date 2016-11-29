@@ -1,6 +1,30 @@
 #include "PacketFactory.h"
-
 using namespace std;
+
+std::string PacketFactory::packet_name[PacketType::kSize];
+
+void PacketFactory::setPacketNames()
+{
+	packet_name[kHello] = "Hello";
+	packet_name[kIntro] = "Intro";
+	packet_name[kJoined] = "Joined";
+	packet_name[kMessage] = "Message";
+	packet_name[kNotifyDisconnected] = "NotifyDisconnected";
+	packet_name[kEnterPlaying] = "EnterPlaying";
+	packet_name[kEnterStarting] = "EnterStarting";
+	packet_name[kFull] = "Full";
+	packet_name[kRequestStart] = "RequestStart";
+	packet_name[kReady] = "Ready";
+	packet_name[kDisconnection] = "Disconnection";
+	packet_name[kCreateRoom] = "CreateRoom";
+	packet_name[kRoomIntro] = "RoomIntro";
+	packet_name[kJoinRoom] = "JoinRoom";
+	packet_name[kRoomIsCreated] = "RoomIsCreated";
+	packet_name[kRoomInfo] = "RoomInfo";
+	packet_name[kClientHasJoined] = "ClientHasJoined";
+	packet_name[kRoomHasDestroyed] = "RoomHasDestroyed";
+	packet_name[kRequestShowRoomInfo] = "RequestShowRoomInfo";
+}
 
 GamePacket PacketFactory::createPacket(PacketType type)
 {
@@ -34,6 +58,7 @@ GamePacket PacketFactory::createIntroPacket(
 
 GamePacket PacketFactory::createJoinedPacket(
 	const std::vector<std::pair<int, std::string> >& users,
+	int joinedID,
 	int appointedID, bool changed)
 {
 	flatbuffers::FlatBufferBuilder builder;
@@ -50,7 +75,7 @@ GamePacket PacketFactory::createJoinedPacket(
 	auto fusers = builder.CreateVector(users_vec);
 	auto appointed_data = Data::CreateAppointedData(builder, appointedID, changed);
 
-	auto joined_data = Data::CreateJoinedData(builder, fusers, appointed_data);
+	auto joined_data = Data::CreateJoinedData(builder, fusers, joinedID, appointed_data);
 	builder.Finish(joined_data);
 
 	return GamePacket(builder, kJoined);

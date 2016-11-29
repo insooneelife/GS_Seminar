@@ -4,35 +4,46 @@
 #include "NetworkManagerRoomServer.h"
 #include "PacketFactory.h"
 using namespace std;
+using namespace std::placeholders;
 
 std::unique_ptr<NetworkManagerRoomServer> NetworkManagerRoomServer::instance = nullptr;
 
 void NetworkManagerRoomServer::staticInit(int number, const std::string& server_addr)
 {
 	SocketUtil::staticInit();
-	instance.reset(new NetworkManagerRoomServer(number));
-	instance->init(server_addr);
+	instance.reset(new NetworkManagerRoomServer(number, server_addr));
+	instance->init();
 }
 
-NetworkManagerRoomServer::NetworkManagerRoomServer(int number)
+NetworkManagerRoomServer::NetworkManagerRoomServer(int number, const std::string& server_addr)
 	:
+	_lobby_server_address(SocketAddress::createFromString(server_addr)),
 	_appointed_id(0),
 	_time(0),
 	_room_number(number)
 {
-	_socket.reset(UDPSocket::create(SocketUtil::AddressFamily::INET));
+	_state = kWaitingRoom;
 	
 	// Start with any port available.
 	_address.reset(new SocketAddress());
+
+	_handle_packets_map[States::kWaitingRoom][PacketFactory::kHello] = bind(&NetworkManagerRoomServer::handleHelloPacket, this, _1, _2, _3);
+	_handle_packets_map[States::kWaitingRoom][PacketFactory::kMessage] = bind(&NetworkManagerRoomServer::handleMessagePacket, this, _1, _2, _3);
+	_handle_packets_map[States::kWaitingRoom][PacketFactory::kDisconnection] = bind(&NetworkManagerRoomServer::handleDisconnectionPacket, this, _1, _2, _3);
+	_handle_packets_map[States::kWaitingRoom][PacketFactory::kRequestStart] = bind(&NetworkManagerRoomServer::handleRequestStartPacket, this, _1, _2, _3);
+	
+	_handle_packets_map[States::kStarting][PacketFactory::kReady] = bind(&NetworkManagerRoomServer::handleReadyPacket, this, _1, _2, _3);
+
+	_handle_packets_map[States::kPlaying][PacketFactory::kMessage] = bind(&NetworkManagerRoomServer::handleMessagePacket, this, _1, _2, _3);
+	_handle_packets_map[States::kPlaying][PacketFactory::kDisconnection] = bind(&NetworkManagerRoomServer::handleDisconnectionPacket, this, _1, _2, _3);
 }
 
-bool NetworkManagerRoomServer::init(const std::string& server_addr)
+// Let's put exception occuring functions here.
+bool NetworkManagerRoomServer::init()
 {
-	_state = kWaitingRoom;
+	_socket.reset(UDPSocket::create(SocketUtil::AddressFamily::INET));
 	_socket->bind(*_address);
 	_socket->setNoneBlockingMode(true);
-
-	_lobby_server_address.reset(SocketAddress::createFromString(server_addr));
 
 	// Notify to lobby server that room created successfully.
 	GamePacket& packet = PacketFactory::createRoomIntroPacket(_room_number, _address->toString());
@@ -65,39 +76,6 @@ void NetworkManagerRoomServer::update()
 }
 
 
-void NetworkManagerRoomServer::handlePacketByType(const GamePacket& packet, const SocketAddress& from)
-{
-	if (packet.getType() == PacketFactory::kHello)
-	{
-		cout << "packet : [HelloPacket]  from : " << from.toString() << endl;
-		handleHelloPacket(from, packet.getBody(), packet.getBodyLength());
-	}
-	else if (packet.getType() == PacketFactory::kMessage)
-	{
-		cout << "packet : [MessagePacket]  from : " << from.toString() << endl;
-		handleMessagePacket(from, packet.getBody(), packet.getBodyLength());
-	}
-	else if (packet.getType() == PacketFactory::kDisconnection)
-	{
-		cout << "packet : [Disconnection]  from : " << from.toString() << endl;
-		handleDisconnectionPacket(from, packet.getBody(), packet.getBodyLength());
-	}
-	else if (packet.getType() == PacketFactory::kRequestStart)
-	{
-		cout << "packet : [RequestStart]  from : " << from.toString() << endl;
-		handleRequestStartPacket(from, packet.getBody(), packet.getBodyLength());
-	}
-	else if (packet.getType() == PacketFactory::kReady)
-	{
-		cout << "packet : [Ready]  from : " << from.toString() << endl;
-		handleReadyPacket(from, packet.getBody(), packet.getBodyLength());
-	}
-	else
-	{
-		cout << "can't handle this packet : " << packet.getType() << std::endl;
-	}
-	cout << endl;
-}
 
 void NetworkManagerRoomServer::handleHelloPacket(
 	const SocketAddress& from,
@@ -109,7 +87,7 @@ void NetworkManagerRoomServer::handleHelloPacket(
 		"Verify failed [UserData]!");
 
 	// Process packet logic
-	int client_id = _clients.size() + 1;
+	int client_id = genUniqueID(_clients);
 	auto data = Data::GetUserData(buffer);
 	std::string name = data->name()->c_str();
 
@@ -138,7 +116,7 @@ void NetworkManagerRoomServer::handleHelloPacket(
 		users.push_back(std::make_pair(id, _id_to_name[id]));
 	}
 	// Response to joined client with other users data
-	GamePacket& joined = PacketFactory::createJoinedPacket(users, _appointed_id, change);
+	GamePacket& joined = PacketFactory::createJoinedPacket(users, client_id, _appointed_id, change);
 	send(joined, from);
 
 	// Response to all other clients
@@ -206,8 +184,7 @@ void NetworkManagerRoomServer::handleRequestStartPacket(
 	const uint8_t* buffer,
 	size_t length)
 {
-	_state = kStarting;
-	std::cout << "state changed to \"kStarting\"" << std::endl;
+	changeState(kStarting);
 
 	GamePacket& packet = PacketFactory::createPacket(PacketFactory::kEnterStarting);
 	for (auto c : _clients)
@@ -227,8 +204,7 @@ void NetworkManagerRoomServer::handleReadyPacket(
 	// if all clients are ready.
 	if (_ready_set.size() == _clients.size())
 	{
-		_state = kPlaying;
-		std::cout << "state changed to \"kPlaying\"" << std::endl;
+		changeState(kPlaying);
 
 		GamePacket& packet = PacketFactory::createPacket(PacketFactory::kEnterPlaying);
 		for (auto c : _clients)

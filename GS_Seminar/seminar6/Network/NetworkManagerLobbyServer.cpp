@@ -68,6 +68,11 @@ void NetworkManagerLobbyServer::handlePacketByType(const GamePacket& packet, con
 		cout << "packet : [JoinRoom]  from : " << from.toString() << endl;
 		handleJoinRoomPacket(from, packet.getBody(), packet.getBodyLength());
 	}
+	else if (packet.getType() == PacketFactory::kRequestShowRoomInfo)
+	{
+		cout << "packet : [RequestShowRoomInfo]  from : " << from.toString() << endl;
+		handleRequestShowRoomInfoPacket(from, packet.getBody(), packet.getBodyLength());
+	}
 	else
 	{
 		cout << "can't handle this packet : " << packet.getType() << std::endl;
@@ -209,4 +214,21 @@ void NetworkManagerLobbyServer::handleRoomHasDestroyedPacket(
 	const uint8_t* buffer,
 	size_t length)
 {
+}
+
+void NetworkManagerLobbyServer::handleRequestShowRoomInfoPacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
+{
+	std::vector<std::pair<int, std::string>> rooms;
+	for (auto e : _rooms)
+	{
+		rooms.push_back(std::make_pair(e.first, e.second.toString()));
+	}
+
+	GamePacket& packet = PacketFactory::createRoomInfoPacket(rooms);
+
+	for (auto c : _clients)
+		send(packet, c.second);
 }

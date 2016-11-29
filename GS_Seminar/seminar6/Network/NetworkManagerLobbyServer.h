@@ -34,6 +34,7 @@ public:
 	void handleRoomIntroPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleJoinRoomPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleRoomHasDestroyedPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
+	void handleRequestShowRoomInfoPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 
 private:
 

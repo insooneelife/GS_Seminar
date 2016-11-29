@@ -39,7 +39,8 @@ public:
 		kRoomInfo,
 
 		kClientHasJoined,
-		kRoomHasDestroyed
+		kRoomHasDestroyed,
+		kRequestShowRoomInfo
 	};
 
 	static GamePacket createPacket(PacketType type);

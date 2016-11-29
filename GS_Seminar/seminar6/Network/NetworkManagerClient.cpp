@@ -82,6 +82,11 @@ void NetworkManagerClient::processInput()
 				GamePacket& packet = PacketFactory::createJoinRoomPacket(number);
 				send(packet, *_server_address);
 			}
+			else if (_input_message == "--ShowRooms")
+			{
+				GamePacket packet = PacketFactory::createPacket(PacketFactory::kRequestShowRoomInfo);
+				send(packet, *_server_address);
+			}
 			else
 			{
 				GamePacket& packet = PacketFactory::createMessagePacket(_id, _client_name, _input_message);
@@ -135,6 +140,11 @@ void NetworkManagerClient::handlePacketByType(
 	{
 		cout << "packet : [RoomIsCreated]  from : " << from.toString() << endl;
 		handleRoomIsCreatedPacket(from, packet.getBody(), packet.getBodyLength());
+	}
+	else if (packet.getType() == PacketFactory::kRoomInfo)
+	{
+		cout << "packet : [RoomInfo]  from : " << from.toString() << endl;
+		handleRoomInfoPacket(from, packet.getBody(), packet.getBodyLength());
 	}
 	else
 	{
@@ -251,7 +261,10 @@ void NetworkManagerClient::handleEnterPlayingPacket(
 
 
 
-void NetworkManagerClient::handleRoomIsCreatedPacket(const SocketAddress& from, const uint8_t* buffer, size_t length)
+void NetworkManagerClient::handleRoomIsCreatedPacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
 {
 	assert(Data::VerifyRoomDataBuffer(flatbuffers::Verifier(buffer, length)) &&
 		"Verify failed [RoomData]!");
@@ -264,4 +277,24 @@ void NetworkManagerClient::handleRoomIsCreatedPacket(const SocketAddress& from, 
 
 	GamePacket& packet = PacketFactory::createHelloPacket(_id, _client_name);
 	send(packet, *_server_address);
+}
+
+
+void NetworkManagerClient::handleRoomInfoPacket(
+	const SocketAddress& from,
+	const uint8_t* buffer,
+	size_t length)
+{
+	assert(Data::VerifyRoomsDataBuffer(flatbuffers::Verifier(buffer, length)) &&
+		"Verify failed [RoomsData]!");
+
+	auto data = Data::GetRoomsData(buffer);
+	auto frooms = data->rooms();
+
+	std::cout << "Rooms" << std::endl;
+	for (auto it = frooms->begin(); it != frooms->end(); ++it)
+	{
+		std::cout << it->number() << " " << it->address() << std::endl;
+	}
+	std::cout << std::endl;
 }

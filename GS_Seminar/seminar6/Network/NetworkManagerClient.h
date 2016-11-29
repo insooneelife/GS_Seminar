@@ -33,6 +33,7 @@ public:
 	void handleEnterStartingPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleEnterPlayingPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 	void handleRoomIsCreatedPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
+	void handleRoomInfoPacket(const SocketAddress& from, const uint8_t* buffer, size_t length);
 
 private:
 

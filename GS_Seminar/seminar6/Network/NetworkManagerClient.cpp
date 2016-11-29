@@ -294,7 +294,7 @@ void NetworkManagerClient::handleRoomInfoPacket(
 	std::cout << "Rooms" << std::endl;
 	for (auto it = frooms->begin(); it != frooms->end(); ++it)
 	{
-		std::cout << it->number() << " " << it->address() << std::endl;
+		std::cout << it->number() << " " << it->address()->c_str() << std::endl;
 	}
 	std::cout << std::endl;
 }

@@ -1,0 +1,11 @@
+include "InGameUserData.fbs";
+
+namespace Data;
+
+table WorldData 
+{
+	users : [InGameUserData];
+	map : int;
+}
+
+root_type WorldData;

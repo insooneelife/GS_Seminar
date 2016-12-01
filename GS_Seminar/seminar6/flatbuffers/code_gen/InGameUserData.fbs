@@ -1,0 +1,11 @@
+include "UserData.fbs";
+
+namespace Data;
+
+table InGameUserData 
+{
+	user : UserData;
+	character : int;
+}
+
+root_type InGameUserData;

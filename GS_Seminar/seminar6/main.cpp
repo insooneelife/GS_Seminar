@@ -4,6 +4,8 @@
 #include "Network/NetworkManagerClient.h"
 
 
+
+
 int main(int argc, char **argv)
 {
 	if (argc == 3)
@@ -67,6 +69,13 @@ int main(int argc, char **argv)
 			while (1)
 				NetworkManagerRoomServer::instance->update();
 		}
+	}
+	else
+	{
+		// For debug start
+		NetworkManagerLobbyServer::staticInit(8000);
+		while (1)
+			NetworkManagerLobbyServer::instance->update();
 	}
 	std::cout << "argument for lobby server : test.exe Lobby 8000" << std::endl;
 	std::cout << "argument for room server : test.exe Room 13 127.0.0.1:8000" << std::endl;

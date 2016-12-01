@@ -54,6 +54,9 @@ private:
 		auto j = _id_to_name.find(id);
 		std::string name = j->second;
 
+		std::cout << _clients.size() << " " 
+			<< _clients_addr_to_id.size() << " " << _id_to_name.size() << std::endl;
+
 		_clients.erase(id);
 		_clients_addr_to_id.erase(address);
 		_id_to_name.erase(id);

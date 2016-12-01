@@ -40,6 +40,14 @@ JoinedData
 	joined : int
 	appoint : AppointedData
 
+InGameUserData
+	user : UserData
+	character : int
+	
+WorldData
+	users : [InGameUserData]
+	map : int
+
 
 Handling Packets												Handling Packets 
 --- Lobby Server ---

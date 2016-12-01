@@ -20,13 +20,13 @@ NetworkManagerLobbyServer::NetworkManagerLobbyServer(uint16_t port)
 	_address.reset(new SocketAddress(INADDR_ANY, port));
 
 	// Set with handler functions.
-	_handle_packets_map[States::kDefault][PacketFactory::kHello] = bind(&NetworkManagerLobbyServer::handleHelloPacket, this, _1, _2, _3);
-	_handle_packets_map[States::kDefault][PacketFactory::kMessage] = bind(&NetworkManagerLobbyServer::handleMessagePacket, this, _1, _2, _3);
-	_handle_packets_map[States::kDefault][PacketFactory::kDisconnection] = bind(&NetworkManagerLobbyServer::handleDisconnectionPacket, this, _1, _2, _3);
-	_handle_packets_map[States::kDefault][PacketFactory::kCreateRoom] = bind(&NetworkManagerLobbyServer::handleCreateRoomPacket, this, _1, _2, _3);
-	_handle_packets_map[States::kDefault][PacketFactory::kRoomIntro] = bind(&NetworkManagerLobbyServer::handleRoomIntroPacket, this, _1, _2, _3);
-	_handle_packets_map[States::kDefault][PacketFactory::kJoinRoom] = bind(&NetworkManagerLobbyServer::handleJoinRoomPacket, this, _1, _2, _3);
-	_handle_packets_map[States::kDefault][PacketFactory::kRequestShowRoomInfo] = bind(&NetworkManagerLobbyServer::handleRequestShowRoomInfoPacket, this, _1, _2, _3);
+	_handle_packets_map[States::kDefault][PacketFactory::kHello]				=	bind(&NetworkManagerLobbyServer::handleHelloPacket, this, _1, _2, _3);
+	_handle_packets_map[States::kDefault][PacketFactory::kMessage]				=	bind(&NetworkManagerLobbyServer::handleMessagePacket, this, _1, _2, _3);
+	_handle_packets_map[States::kDefault][PacketFactory::kDisconnection]		=	bind(&NetworkManagerLobbyServer::handleDisconnectionPacket, this, _1, _2, _3);
+	_handle_packets_map[States::kDefault][PacketFactory::kCreateRoom]			=	bind(&NetworkManagerLobbyServer::handleCreateRoomPacket, this, _1, _2, _3);
+	_handle_packets_map[States::kDefault][PacketFactory::kRoomIntro]			=	bind(&NetworkManagerLobbyServer::handleRoomIntroPacket, this, _1, _2, _3);
+	_handle_packets_map[States::kDefault][PacketFactory::kJoinRoom]				=	bind(&NetworkManagerLobbyServer::handleJoinRoomPacket, this, _1, _2, _3);
+	_handle_packets_map[States::kDefault][PacketFactory::kRequestShowRoomInfo]	=	bind(&NetworkManagerLobbyServer::handleRequestShowRoomInfoPacket, this, _1, _2, _3);
 }
 
 // Let's put exception occuring functions here.
@@ -162,7 +162,6 @@ void NetworkManagerLobbyServer::handleRoomIntroPacket(
 		// Send that room is created to client who requested to create room.
 		GamePacket& packet = PacketFactory::createRoomIsCreatedPacket(number, address);
 		send(packet, iter->second.second);
-		removeClient(iter->second.second);
 	}
 }
 

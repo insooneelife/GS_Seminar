@@ -183,7 +183,6 @@ void NetworkManagerLobbyServer::handleRoomIntroPacket(
 		// Send that room is created to client who requested to create room.
 		GamePacket& packet = PacketFactory::createRoomIsCreatedPacket(number, address);
 		send(packet, iter->second.second);
-		removeClient(iter->second.second);
 	}
 }
 
